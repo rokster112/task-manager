@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --color-custom-blue: #325bff;
+  --color-custom-purple: #9069ff;
+  --color-custom-white: #fcfeff;
+  --color-dark-blue: #415666;
+  --breakpoint-xs: 30rem;
+}
