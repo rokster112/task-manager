@@ -9,7 +9,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
   function logout() {
-    localStorage.removeItem("authToken");
+    localStorage.clear();
     setToken(null);
     setTimeout(() => {
       if (location.pathname === "/") window.location.reload();

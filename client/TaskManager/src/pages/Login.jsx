@@ -22,9 +22,10 @@ export default function Login() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const data = await axios.post(`${API}/auth/login`, formData);
-      const token = data.data;
+      const response = await axios.post(`${API}/auth/login`, formData);
+      const token = response.data;
       localStorage.setItem("authToken", token);
+      console.error(response);
       setIsActive(true);
       setTimeout(() => {
         navigate("/projects", { replace: true });

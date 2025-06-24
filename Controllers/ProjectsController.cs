@@ -3,6 +3,7 @@ using TaskManagerApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace TaskManagerApi.Controllers;
 
@@ -40,7 +41,7 @@ public class ProjectsController : ControllerBase
     try
     {
       var newProject = await _projectsService.CreateProjectAsync(dto, authenticatedUser);
-      return CreatedAtAction(nameof(GetProject), new {id = newProject.Id}, newProject);
+      return CreatedAtAction(nameof(GetProject), new { id = newProject.Id }, newProject);
     }
     catch (Exception ex)
     {
@@ -78,4 +79,13 @@ public class ProjectsController : ControllerBase
     var authenticatedUser = User.FindFirst("UserId")?.Value;
     return await _projectsService.GetMembersAsync(id, authenticatedUser);
   }
+
+[HttpPatch("{id:length(24)}/status-priority")]
+public async Task<ActionResult> UpdateStatusAndPriority(string id, UpdateProjectStatusPriorityDTO dto)
+{
+    var authenticatedUser = User.FindFirst("UserId")?.Value;
+    await _projectsService.UpdateProjectStatusAndPriorityAsync(id, authenticatedUser, dto);
+    return Ok();
+}
+
 }

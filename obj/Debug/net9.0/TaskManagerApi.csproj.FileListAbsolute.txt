@@ -46,3 +46,4 @@
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/client/TaskManager/package-lock.json
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/client/TaskManager/package.json
+/Users/rokas/TaskManagerApi/obj/Debug/net9.0/TaskManagerApi.sourcelink.json

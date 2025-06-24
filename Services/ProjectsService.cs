@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using ZstdSharp;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace TaskManagerApi.Services;
 
@@ -59,6 +60,7 @@ public class ProjectsService
     if (dto.StartDate == null) throw new Exception("Please select start date");
     if (dto.EndDate == null) throw new Exception("Please select end date");
     if (string.IsNullOrWhiteSpace(dto.Description)) throw new Exception("Description input is empty");
+    if (dto.StartDate > dto.EndDate) throw new Exception("Start Date cannot be ahead of End Date");
 
     var newProject = new Project
     {
@@ -106,4 +108,26 @@ public class ProjectsService
 
     await _projectsCollection.UpdateOneAsync(filter, update);
   }
+
+public async Task UpdateProjectStatusAndPriorityAsync(string id, string authenticatedUser, UpdateProjectStatusPriorityDTO dto)
+{
+    var filter = Builders<Project>.Filter.Eq(p => p.Id, id) &
+      Builders<Project>.Filter.Eq(p => p.HeadOfProject.UserId, authenticatedUser);
+
+    var project = await _projectsCollection.Find(p => p.Id == id).FirstOrDefaultAsync();
+    if (project is null)
+        throw new Exception("Project was not found or you're unauthorized.");
+
+    var updateDef = Builders<Project>.Update;
+    UpdateDefinition<Project> update = null;
+
+    if (dto.Status.HasValue)
+        update = update == null ? updateDef.Set(p => p.Status, dto.Status.Value) : update.Set(p => p.Status, dto.Status.Value);
+
+    if (dto.Priority.HasValue)
+        update = update == null ? updateDef.Set(p => p.Priority, dto.Priority.Value) : update.Set(p => p.Priority, dto.Priority.Value);
+
+    if (update != null)
+        await _projectsCollection.UpdateOneAsync(filter, update);
+}
 }
