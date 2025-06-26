@@ -6,4 +6,5 @@ public class TaskManagerDatabaseSettings
   public string DatabaseName { get; set; } = null!;
   public string ProjectsCollectionName { get; set; } = null!;
   public string UsersCollectionName { get; set; } = null!;
+  public string TasksCollectionName { get; set; } = null!;
 }

@@ -1,13 +1,12 @@
 using TaskManagerApi.Models;
 
-public class CreateProjectDTO
+public class CreateProjectTaskDTO
 {
   public string Title { get; set; } = null!;
-  public DateTime? StartDate { get; set; }
-  public DateTime? EndDate { get; set; }
+  public List<string> AssignedForIds { get; set; } = new();
   public string Description { get; set; } = null!;
+  public DateTime? DueBy { get; set; }
   public Priority Priority { get; set; }
   public Status Status { get; set; } = Status.Created;
 
-  public string ClientName { get; set; } = null!;
 }

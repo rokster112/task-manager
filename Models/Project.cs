@@ -31,7 +31,6 @@ public class Project
   public DateTime? StartDate { get; set; }
   public DateTime? EndDate { get; set; }
   public Status Status { get; set; } = Status.Created;
-  public List<ProjectTask> Tasks { get; set; } = new();
   public string Description { get; set; } = null!;
   public Priority Priority { get; set; }
   public UserInfoDTO HeadOfProject { get; set; } = null!;

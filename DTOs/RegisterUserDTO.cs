@@ -1,6 +1,4 @@
 using MongoDB.Bson.Serialization.Attributes;
-using TaskManagerApi.Models;
-
 public class RegisterUserDTO
 {
   [BsonElement("Email")]

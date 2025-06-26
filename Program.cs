@@ -28,6 +28,7 @@ builder.Services.Configure<TaskManagerDatabaseSettings>(
     builder.Configuration.GetSection("TaskManagerDatabase")
 );
 builder.Services.AddSingleton<ProjectsService>();
+builder.Services.AddSingleton<ProjectTasksService>();
 builder.Services.AddSingleton<UsersService>();
 builder.Services.AddControllers()
 .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);

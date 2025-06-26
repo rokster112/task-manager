@@ -17,18 +17,20 @@ public class ProjectsController : ControllerBase
   public ProjectsController(ProjectsService projectsService) =>
     _projectsService = projectsService;
 
-  [HttpGet]
-  public async Task<List<Project>> GetProject()
+  [HttpGet("{query}")]
+  public async Task<List<Project>> GetProjects(string query)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
-    return await _projectsService.GetProjectsAsync(authenticatedUser);
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
+    return await _projectsService.GetProjectsAsync(query, authenticatedUser);
   }
 
   [HttpGet("{id:length(24)}")]
   public async Task<ActionResult<Project>> GetProject(string id)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
-    var project = await _projectsService.GetProjectsAsync(id, authenticatedUser);
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
+    var project = await _projectsService.GetProjectAsync(id, authenticatedUser);
     if (project is null) return NotFound();
     return project;
   }
@@ -37,7 +39,7 @@ public class ProjectsController : ControllerBase
   public async Task<IActionResult> PostProject(CreateProjectDTO dto)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
-
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
     try
     {
       var newProject = await _projectsService.CreateProjectAsync(dto, authenticatedUser);
@@ -53,6 +55,7 @@ public class ProjectsController : ControllerBase
   public async Task<IActionResult> UpdateProject(string id, CreateProjectDTO dto)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
     await _projectsService.UpdateProjectAsync(id, dto, authenticatedUser);
     return Ok();
   }
@@ -61,6 +64,7 @@ public class ProjectsController : ControllerBase
   public async Task<IActionResult> DeleteProject(string id)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
     await _projectsService.DeleteProjectAsync(id, authenticatedUser);
     return NoContent();
   }
@@ -69,6 +73,7 @@ public class ProjectsController : ControllerBase
   public async Task<ActionResult> AddUsers(string id, List<UserInfoDTO> addUsers)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
     await _projectsService.AddMembersAsync(id, addUsers, authenticatedUser);
     return Ok();
   }
@@ -77,6 +82,7 @@ public class ProjectsController : ControllerBase
   public async Task<List<UserInfoDTO>> GetUsers(string id)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
     return await _projectsService.GetMembersAsync(id, authenticatedUser);
   }
 
@@ -84,6 +90,7 @@ public class ProjectsController : ControllerBase
 public async Task<ActionResult> UpdateStatusAndPriority(string id, UpdateProjectStatusPriorityDTO dto)
 {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
     await _projectsService.UpdateProjectStatusAndPriorityAsync(id, authenticatedUser, dto);
     return Ok();
 }

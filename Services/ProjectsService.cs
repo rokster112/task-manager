@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using ZstdSharp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TaskManagerApi.Services;
 
@@ -20,18 +21,47 @@ public class ProjectsService
     _usersCollection = mongoDatabase.GetCollection<AuthUser>(dbSettings.Value.UsersCollectionName);
   }
 
-  public async Task<List<Project>> GetProjectsAsync(string authenticatedUser)
+  public async Task<List<Project>> GetProjectsAsync(string query, string authenticatedUser)
   {
-    var allProjects = await _projectsCollection.Find(_ => true).ToListAsync();
+    var allProjects = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser)).ToListAsync();
+    var activeProjects = allProjects.Where(p => p.Status != Status.Completed).ToList();
+    if (query == "end-date-asc")
+    {
+      return activeProjects.OrderBy(p => p.EndDate).ToList();
+    }
+    if (query == "end-date-desc")
+    {
+      return activeProjects.OrderByDescending(p => p.EndDate).ToList();
+    }
+    if (query == "due-in-seven-days")
+    {
+      return activeProjects.Where(p => p.EndDate >= DateTime.UtcNow && p.EndDate <= DateTime.UtcNow.AddDays(7)).ToList();
+    }
+    if (query == "due-today")
+    {
+      return activeProjects.Where(p => p.EndDate.Value.Date == DateTime.UtcNow.Date).ToList();
+    }
+    if (query == "high-priority")
+    {
+      return activeProjects.Where(p => (int)p.Priority > 2).ToList();
+    }
+    if (query == "in-progress")
+    {
+      return activeProjects.Where(p => p.Status == Status.InProgress).ToList();
+    }
+    if (query == "created-date-asc")
+    {
+      return allProjects.OrderBy(p => p.CreatedAt).ToList();
+    }
+    if (query == "created-date-desc")
+    {
+      return allProjects.OrderByDescending(p => p.CreatedAt).ToList();
+    }
 
-    var userProjects = allProjects
-        .Where(p => p.Users.Any(u => u.UserId == authenticatedUser))
-        .ToList();
-
-    return userProjects;
+    return allProjects;
   }
 
-  public async Task<Project?> GetProjectsAsync(string id, string authenticatedUser) =>
+  public async Task<Project?> GetProjectAsync(string id, string authenticatedUser) =>
     await _projectsCollection.Find(p => p.Id == id && p.Users.Any(u => u.UserId == authenticatedUser)).FirstOrDefaultAsync();
   public async Task UpdateProjectAsync(string id, CreateProjectDTO dto, string authenticatedUser)
   {
@@ -61,6 +91,7 @@ public class ProjectsService
     if (dto.EndDate == null) throw new Exception("Please select end date");
     if (string.IsNullOrWhiteSpace(dto.Description)) throw new Exception("Description input is empty");
     if (dto.StartDate > dto.EndDate) throw new Exception("Start Date cannot be ahead of End Date");
+    if (!Enum.IsDefined(typeof(Priority), dto.Priority)) throw new Exception("Invalid priority selected.");
 
     var newProject = new Project
     {
