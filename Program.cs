@@ -30,6 +30,7 @@ builder.Services.Configure<TaskManagerDatabaseSettings>(
 builder.Services.AddSingleton<ProjectsService>();
 builder.Services.AddSingleton<ProjectTasksService>();
 builder.Services.AddSingleton<UsersService>();
+builder.Services.AddSingleton<UserDashboardService>();
 builder.Services.AddControllers()
 .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

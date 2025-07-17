@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 
-export default function Avatar({ avatarUrl, name }) {
+export default function Avatar({
+  avatarUrl,
+  name,
+  height,
+  width,
+  minHeight,
+  minWidth,
+  fontSize,
+}) {
   const [imageError, setImageError] = useState(false);
   const [bgColor, setBgColor] = useState({});
 
@@ -43,11 +51,13 @@ export default function Avatar({ avatarUrl, name }) {
           src={avatarUrl}
           alt={name}
           onError={() => setImageError(true)}
-          className="w-12 h-12 sm:h-16 sm:w-16 rounded-full object-cover"
+          className={`${minWidth} ${minHeight} ${height} ${width} rounded-full object-cover`}
         />
       ) : (
         <p
-          className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full ${bgColor} flex items-center justify-center font-bold text-white`}
+          className={`${minWidth} ${minHeight} ${height} ${width} ${
+            fontSize ? fontSize : "text-lg sm:text-xl"
+          } rounded-full ${bgColor} flex items-center justify-center font-bold text-white`}
         >
           {avatarDisplay()}
         </p>

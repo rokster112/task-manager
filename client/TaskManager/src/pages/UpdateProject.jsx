@@ -2,6 +2,7 @@ import { useState } from "react";
 import ProjectForm from "../components/ProjectForm";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { TransformDate } from "../utils/TransformDate";
 const API = import.meta.env.VITE_API;
 
 export default function UpdateProject({ project, id, token }) {
@@ -9,8 +10,8 @@ export default function UpdateProject({ project, id, token }) {
   const [err, setErr] = useState(false);
   const [formData, setFormData] = useState({
     Title: project.Title,
-    StartDate: project.StartDate.slice(0, 10),
-    EndDate: project.EndDate.slice(0, 10),
+    StartDate: project.StartDate.slice(0, 16),
+    EndDate: project.EndDate.slice(0, 16),
     Description: project.Description,
     Priority: project.Priority,
     ClientName: project.ClientName,

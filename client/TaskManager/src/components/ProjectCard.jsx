@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 import { PriorityEnum, StatusEnum } from "../pages/Projects";
 import { PriorityColor, StatusColor } from "../utils/AssignColors";
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, search }) {
   const indexOfT = project.StartDate.indexOf("T");
   const statusColor = StatusColor(StatusEnum[project.Status]);
   const priorityColor = PriorityColor(PriorityEnum[project.Priority]);
   return (
     <Link
-      to={`/projects/${project.Id}`}
-      className="bg-white rounded-md flex flex-col h-[300px] w-[300px] md:h-[340px] md:w-[340px] lg:w-[300px] shadow-2xl justify-between"
+      to={{ pathname: `/projects/${project.Id}`, search: search }}
+      className="bg-white rounded-md flex flex-col h-[300px] w-[300px] md:h-[340px] md:w-[340px] lg:w-[300px] shadow-2xl justify-between transition-all ease-in-out border-1 border-transparent hover:border-blue-500"
     >
       <div className="flex flex-row justify-between m-2">
         <p className="text-gray-400 font-semibold">

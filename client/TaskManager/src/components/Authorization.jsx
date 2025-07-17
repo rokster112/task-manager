@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 export default function Authorization() {
   const navigate = useNavigate();
   const location = useLocation();
+
   function isTokenExpired(token) {
     try {
       const decoded = jwtDecode(token);

@@ -7,7 +7,7 @@ namespace TaskManagerApi.Controller;
 
 [Authorize]
 [ApiController]
-[Route("/api")]
+[Route("api/home")]
 public class UserDashboardController : ControllerBase
 {
   private readonly UserDashboardService _userDashboardService;
@@ -16,49 +16,82 @@ public class UserDashboardController : ControllerBase
     _userDashboardService = userDashboardService;
   }
 
-  [HttpGet("tasks/{query}")]
-  public async Task<ActionResult<List<ProjectTask>>> GetUserTasks(string query)
+  [HttpGet("tasks/{query?}")]
+  public async Task<ActionResult<List<ProjectTask>>> GetUserTasks(string? query = null)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
     if (authenticatedUser is null)
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    var tasks = await _userDashboardService.GetUserTasksAsync(query, authenticatedUser);
+    var tasks = await _userDashboardService.GetUserTasksAsync(authenticatedUser, query);
     return tasks;
   }
-  [HttpGet("projects/{query}")]
-  public async Task<ActionResult<List<Project>>> GetUserProjects(string query)
+  [HttpGet("projects/{query?}")]
+  public async Task<ActionResult<List<Project>>> GetUserProjects(string? query = null)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
     if (authenticatedUser is null)
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    var projects = await _userDashboardService.GetUserProjectsAsync(query, authenticatedUser);
+    var projects = await _userDashboardService.GetUserProjectsAsync(authenticatedUser, query);
     return projects;
   }
   [HttpGet("user-info")]
   public async Task<ActionResult<AuthUser>> GetUserInfo()
   {
-    var authenticatedUser = User.FindFirst("UserId")?.Value;
-    if (authenticatedUser is null)
+    try
     {
-      return Unauthorized(new { message = "You are not logged in" });
+      var authenticatedUser = User.FindFirst("UserId")?.Value;
+      if (authenticatedUser is null)
+      {
+        return Unauthorized(new { message = "You are not logged in" });
+      }
+      var user = await _userDashboardService.GetUserFullInfoAsync(authenticatedUser);
+      return user;
+
     }
-    var user = await _userDashboardService.GetUserFullInfoAsync(authenticatedUser);
-    return user;
+    catch (Exception ex)
+    {
+      return BadRequest(new { error = ex.Message });
+    }
   }
 
   [HttpPatch("user-info/update")]
   public async Task<ActionResult> UpdateUserInfo(UpdateUserInfoDTO dto)
   {
-    var authenticatedUser = User.FindFirst("UserId")?.Value;
-    if (authenticatedUser is null)
+    try
     {
-      return Unauthorized(new { message = "You are not logged in" });
+      var authenticatedUser = User.FindFirst("UserId")?.Value;
+      if (authenticatedUser is null)
+      {
+        return Unauthorized(new { message = "You are not logged in" });
+      }
+      await _userDashboardService.UpdateUserInfoAsync(authenticatedUser, dto);
+      return Ok();
     }
-    await _userDashboardService.UpdateUserInfoAsync(authenticatedUser, dto);
-    return Ok();
+    catch (Exception ex)
+    {
+      return BadRequest(new { error = ex.Message });
+    }
+  }
+  [HttpGet("calendar-dates")]
+  public async Task<ActionResult<List<ProjectTask>>> GetCalendarDates()
+  {
+    try
+    {
+      var authenticatedUser = User.FindFirst("UserId")?.Value;
+      if (authenticatedUser is null)
+      {
+        return Unauthorized(new { message = "You are not logged in" });
+      }
+      var tasks = await _userDashboardService.UserCalendarDatesAsync(authenticatedUser);
+      return tasks;
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(new { error = ex.Message });
+    }
   }
 }

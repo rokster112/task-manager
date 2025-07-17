@@ -17,12 +17,12 @@ public class ProjectsController : ControllerBase
   public ProjectsController(ProjectsService projectsService) =>
     _projectsService = projectsService;
 
-  [HttpGet("{query}")]
-  public async Task<List<Project>> GetProjects(string query)
+  [HttpGet("{query?}")]
+  public async Task<List<Project>> GetProjects(string? query = null)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
     if (authenticatedUser is null) throw new Exception("You are not logged in");
-    return await _projectsService.GetProjectsAsync(query, authenticatedUser);
+    return await _projectsService.GetProjectsAsync(authenticatedUser, query);
   }
 
   [HttpGet("{id:length(24)}")]

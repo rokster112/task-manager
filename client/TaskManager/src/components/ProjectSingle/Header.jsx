@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-
+import editProject from "../../assets/edit-project.png";
+import deleteProject from "../../assets/delete-project.png";
 export default function Header({
   setToggleMessage,
   title,
@@ -27,19 +28,20 @@ export default function Header({
         </p>
       )}
       {currentUser === headOfProject && (
-        <div className="flex gap-2 self-end m-2 sm:m-4">
+        <div className="flex gap-4 self-end m-2 sm:m-4">
           <Link
             to={`/projects/${id}/update-project`}
-            className="w-24 h-10 bg-green-500 font-semibold rounded-md text-white flex items-center justify-center transition duration-400 ease-in-out hover:bg-green-600"
+            className="w-8 h-8 p-1 rounded-md flex items-center justify-center transition duration-400 ease-in-out hover:bg-green-200"
           >
-            Update
+            <img src={editProject} className="h-full w-full" />
           </Link>
-          <button
-            className="bg-red-600 font-semibold text-white rounded-md p-2 cursor-pointer w-24 h-10 transition duration-400 ease-in-out hover:bg-red-700"
-            onClick={() => setToggleMessage(true)}
-          >
-            Delete
-          </button>
+          <div className="w-8 h-8 p-1 rounded-md cursor-pointer flex items-center justify-center transition duration-400 ease-in-out hover:bg-red-200">
+            <img
+              src={deleteProject}
+              className="h-full w-full"
+              onClick={() => setToggleMessage(true)}
+            />
+          </div>
         </div>
       )}
     </>

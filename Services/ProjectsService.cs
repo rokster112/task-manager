@@ -21,7 +21,7 @@ public class ProjectsService
     _usersCollection = mongoDatabase.GetCollection<AuthUser>(dbSettings.Value.UsersCollectionName);
   }
 
-  public async Task<List<Project>> GetProjectsAsync(string query, string authenticatedUser)
+  public async Task<List<Project>> GetProjectsAsync(string authenticatedUser, string? query = null)
   {
     var allProjects = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser)).ToListAsync();
     var activeProjects = allProjects.Where(p => p.Status != Status.Completed).ToList();
@@ -56,6 +56,10 @@ public class ProjectsService
     if (query == "created-date-desc")
     {
       return allProjects.OrderByDescending(p => p.CreatedAt).ToList();
+    }
+    if (query == "my-led-projects")
+    {
+      return allProjects.Where(p => p.HeadOfProject.UserId == authenticatedUser).ToList();
     }
 
     return allProjects;
@@ -96,8 +100,8 @@ public class ProjectsService
     var newProject = new Project
     {
       Title = dto.Title,
-      StartDate = dto.StartDate,
-      EndDate = dto.EndDate,
+      StartDate = dto.StartDate ?? DateTime.UtcNow,
+      EndDate = dto.EndDate ?? DateTime.UtcNow,
       Description = dto.Description,
       Priority = dto.Priority,
       ClientName = dto.ClientName,

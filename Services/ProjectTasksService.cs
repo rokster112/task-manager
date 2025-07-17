@@ -54,10 +54,13 @@ public class ProjectTasksService
       Title = dto.Title,
       AssignedForIds = dto.AssignedForIds,
       Description = dto.Description,
-      DueBy = dto.DueBy,
+      DueBy = dto.DueBy is DateTime dueBy
+          ? DateTime.SpecifyKind(dueBy, DateTimeKind.Utc)
+          : DateTime.UtcNow,
       Priority = dto.Priority,
-      Status = dto.Status,
+      Status = !Enum.IsDefined(typeof(Status), dto.Status) ? Status.Created : dto.Status,
       ProjectId = projectId,
+      CompletedAt = dto.Status == Status.Completed ? DateTime.UtcNow : null
     };
 
     await _tasksCollection.InsertOneAsync(newTask);
@@ -74,7 +77,6 @@ public class ProjectTasksService
 
     task.Title = !string.IsNullOrWhiteSpace(dto.Title) ? dto.Title : task.Title;
     task.Description = !string.IsNullOrWhiteSpace(dto.Description) ? dto.Description : task.Description;
-
     if (dto.DueBy != null && dto.DueBy >= DateTime.UtcNow)
       task.DueBy = dto.DueBy.Value;
 
@@ -86,9 +88,7 @@ public class ProjectTasksService
 
     if (dto.AssignedForIds != null && dto.AssignedForIds.Count > 0)
     {
-      task.AssignedForIds = task.AssignedForIds
-          .Union(dto.AssignedForIds)
-          .ToList();
+      task.AssignedForIds = dto.AssignedForIds;
     }
     if (dto.Status == Status.Completed)
     {
@@ -111,21 +111,43 @@ public class ProjectTasksService
     await _tasksCollection.DeleteOneAsync(t => t.TaskId == id && t.ProjectId == projectId);
   }
 
-  public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId, string id)
+//Route without task id
+  public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId)
   {
-    var project = await _projectsCollection.Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser).FirstOrDefaultAsync();
+    var project = await _projectsCollection
+        .Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser)
+        .FirstOrDefaultAsync();
+
     if (project is null) throw new Exception("You are not authorized");
+
+    var userIds = project.Users.Select(u => u.UserId).ToList();
+
+    var allUsers = await _usersCollection.Find(u => userIds.Contains(u.UserId)).ToListAsync();
+    return allUsers
+        .Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl })
+        .ToList();
+  }
+
+//Route with task id
+public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId, string id)
+{
+    var project = await _projectsCollection
+        .Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser)
+        .FirstOrDefaultAsync();
+
+    if (project is null) throw new Exception("You are not authorized");
+
     var task = await _tasksCollection.Find(t => t.TaskId == id).FirstOrDefaultAsync();
     if (task is null) throw new Exception("Task not found");
 
     var userIds = project.Users
-        .Where(p => !task.AssignedForIds.Contains(p.UserId))
         .Select(p => p.UserId)
         .ToList();
 
-
     var allUsers = await _usersCollection.Find(u => userIds.Contains(u.UserId)).ToListAsync();
-    return allUsers.Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl }).ToList();
+    return allUsers
+        .Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl })
+        .ToList();
+}
 
-  }
 }

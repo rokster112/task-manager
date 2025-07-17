@@ -40,7 +40,14 @@ export default function UsersTable({
                   currentUser === u.UserId ? "bg-[#a9f0c4]" : "bg-[#feffff]"
                 } border-b border-gray-200 flex flex-row p-2 items-center rounded-md`}
               >
-                <Avatar avatarUrl={u.AvatarUrl} name={u.FullName} />
+                <Avatar
+                  avatarUrl={u.AvatarUrl}
+                  name={u.FullName}
+                  height={"sm:h-16"}
+                  width={"sm:w-16"}
+                  minHeight={"h-12"}
+                  minWidth={"w-12"}
+                />
                 <div className="ml-2 overflow-hidden">
                   <p className="font-semibold truncate">{u.FullName}</p>
                   <p className="text-gray-500 text-sm truncate">{u.Position}</p>
@@ -69,6 +76,10 @@ export default function UsersTable({
                     <Avatar
                       avatarUrl={filteredMemb.AvatarUrl}
                       name={filteredMemb.FullName}
+                      height={"sm:h-16"}
+                      width={"sm:w-16"}
+                      minHeight={"h-12"}
+                      minWidth={"w-12"}
                     />
                     <div className="ml-2 overflow-hidden">
                       <p className="font-semibold truncate">

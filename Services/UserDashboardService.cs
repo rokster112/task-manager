@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -20,7 +21,7 @@ public class UserDashboardService
     _userCollection = mongoDatabase.GetCollection<AuthUser>(dbSettings.Value.UsersCollectionName);
   }
 
-  public async Task<List<ProjectTask>> GetUserTasksAsync(string query, string authenticatedUser)
+  public async Task<List<ProjectTask>> GetUserTasksAsync(string authenticatedUser, string? query = null)
   {
     if (query == "overdue-user-tasks")
     {
@@ -48,7 +49,7 @@ public class UserDashboardService
     return activeTasks;
   }
 
-  public async Task<ActionResult<List<Project>>> GetUserProjectsAsync(string query, string authenticatedUser)
+  public async Task<ActionResult<List<Project>>> GetUserProjectsAsync(string authenticatedUser, string? query = null)
   {
     if (query == "upcoming")
     {
@@ -94,8 +95,9 @@ public class UserDashboardService
   public async Task UpdateUserInfoAsync(string authenticatedUser, UpdateUserInfoDTO dto)
   {
     var user = await GetUserFullInfoAsync(authenticatedUser);
+    bool isValid = BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.Password);
+    if (!string.IsNullOrWhiteSpace(dto.OldPassword) && !isValid) throw new UnauthorizedAccessException("Old password is incorrect!");
     var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
     user.Email = string.IsNullOrWhiteSpace(dto.Email) ? user.Email : dto.Email;
     user.Password = string.IsNullOrWhiteSpace(dto.Password) ? user.Password : passwordHash;
     user.FullName = string.IsNullOrWhiteSpace(dto.FullName) ? user.FullName : dto.FullName;
@@ -103,5 +105,11 @@ public class UserDashboardService
     user.AvatarUrl = string.IsNullOrWhiteSpace(dto.AvatarUrl) ? user.AvatarUrl : dto.AvatarUrl;
 
     await _userCollection.ReplaceOneAsync(u => u.UserId == user.UserId, user);
+  }
+
+  public async Task<List<ProjectTask>> UserCalendarDatesAsync(string authenticatedUser)
+  {
+    var tasks = await _tasksCollection.Find(t => t.AssignedForIds.Contains(authenticatedUser)).ToListAsync();
+    return tasks;
   }
 }

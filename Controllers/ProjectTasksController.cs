@@ -17,7 +17,7 @@ public class ProjectTasksController : ControllerBase
   public ProjectTasksController(ProjectTasksService tasksService) =>
   _tasksService = tasksService;
 
-  [HttpGet("{query}")]
+  [HttpGet]
   public async Task<ActionResult<List<ProjectTask>>> GetTasks(string projectId)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
@@ -25,7 +25,14 @@ public class ProjectTasksController : ControllerBase
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    return await _tasksService.GetTasksAsync(authenticatedUser, projectId);
+    try
+    {
+      return await _tasksService.GetTasksAsync(authenticatedUser, projectId);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
   }
 
   [HttpGet("{id:length(24)}")]
@@ -36,8 +43,15 @@ public class ProjectTasksController : ControllerBase
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    var task = await _tasksService.GetTaskAsync(authenticatedUser, projectId, id);
-    return Ok(task);
+    try
+    {
+      var task = await _tasksService.GetTaskAsync(authenticatedUser, projectId, id);
+      return Ok(task);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
   }
 
   [HttpPost]
@@ -48,8 +62,15 @@ public class ProjectTasksController : ControllerBase
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    var newTask = await _tasksService.CreateTaskAsync(authenticatedUser, projectId, dto);
-    return CreatedAtAction(nameof(GetTask), new { projectId = projectId, id = newTask.TaskId }, newTask);
+    try
+    {
+      var newTask = await _tasksService.CreateTaskAsync(authenticatedUser, projectId, dto);
+      return CreatedAtAction(nameof(GetTask), new { projectId = projectId, id = newTask.TaskId }, newTask);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
   }
 
   [HttpPatch("{id:length(24)}")]
@@ -60,20 +81,54 @@ public class ProjectTasksController : ControllerBase
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    await _tasksService.UpdateTaskAsync(authenticatedUser, projectId, id, dto);
-    return Ok();
+    try
+    {
+      await _tasksService.UpdateTaskAsync(authenticatedUser, projectId, id, dto);
+      return Ok();
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
+
   }
 
   [HttpGet("{id:length(24)}/members")]
-  public async Task<ActionResult<List<UserInfoDTO>>> GetMembers(string projectId, string id)
+  public async Task<ActionResult<List<UserInfoDTO>>> GetMembersWithTask(string projectId, string id)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
     if (authenticatedUser is null)
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    return await _tasksService.GetMembersAsync(authenticatedUser, projectId, id);
+    try
+    {
+      return await _tasksService.GetMembersAsync(authenticatedUser, projectId, id);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
   }
+
+  [HttpGet("members")]
+  public async Task<ActionResult<List<UserInfoDTO>>> GetMembers(string projectId)
+  {
+    var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null)
+    {
+      return Unauthorized(new { message = "You are not logged in" });
+    }
+    try
+    {
+      return await _tasksService.GetMembersAsync(authenticatedUser, projectId);
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
+  }
+
   [HttpDelete("{id:length(24)}")]
   public async Task<ActionResult> DeleteTask(string projectId, string id)
   {
@@ -82,7 +137,15 @@ public class ProjectTasksController : ControllerBase
     {
       return Unauthorized(new { message = "You are not logged in" });
     }
-    await _tasksService.DeleteTaskAsync(authenticatedUser, projectId, id);
-    return NoContent();
+    try
+    {
+      await _tasksService.DeleteTaskAsync(authenticatedUser, projectId, id);
+      return NoContent();
+    }
+    catch (Exception ex)
+    {
+      return BadRequest(ex.Message);
+    }
+
   }
 }

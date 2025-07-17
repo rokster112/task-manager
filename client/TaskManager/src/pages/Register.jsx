@@ -2,10 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bg from "../assets/form-bg.png";
+import darkBg from "../assets/Dark-theme-bg.png";
+import { UserFormHandleChange } from "../utils/UserFormHandleChange";
 
 const API = import.meta.env.VITE_API;
 
-export default function Register() {
+export default function Register({ theme }) {
   const navigate = useNavigate();
 
   const [isActive, setIsActive] = useState(false);
@@ -17,12 +19,6 @@ export default function Register() {
     Position: "",
     AvatarUrl: "",
   });
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErr(false);
-  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -41,16 +37,30 @@ export default function Register() {
   return (
     <div
       className="h-screen w-full absolute top-0 bg-no-repeat bg-cover pt-[200px]"
-      style={{ backgroundImage: `url(${bg})` }}
+      style={{
+        backgroundImage: `url(${theme === "to-blue-200" ? bg : darkBg})`,
+      }}
     >
       <form
-        className="relative flex gap-2 flex-col justify-start rounded-xl items-center h-[85%] xl:h-[75%] mx-auto w-[calc(100vw-40px)] xs:max-w-[400px] sm:max-w-[500px] bg-gradient-to-br from-white to-blue-50 bg-transparent shadow-xl"
+        className={`relative flex gap-2 flex-col justify-start rounded-xl items-center h-[85%] xl:h-[75%] mx-auto w-[calc(100vw-40px)] xs:max-w-[400px] sm:max-w-[500px] bg-gradient-to-br from-transparent to-white ${
+          theme === "to-black"
+            ? "shadow-[0_12px_24px_rgba(0,0,0,0.8)]"
+            : "shadow-xl"
+        }`}
         onSubmit={(e) => handleSubmit(e)}
       >
-        <h1 className="text-5xl sm:text-6xl pt-4 font-semibold text-dark-blue">
+        <h1
+          className={`text-5xl sm:text-6xl pt-4 font-semibold ${
+            theme === "to-black" ? "text-light-blue" : "text-dark-blue"
+          }`}
+        >
           Register
         </h1>
-        <p className="text-dark-blue text-xl pt-3">
+        <p
+          className={`${
+            theme === "to-black" ? "text-light-blue" : "text-dark-blue"
+          } text-xl pt-3`}
+        >
           Start building your profile.
         </p>
         <input
@@ -58,7 +68,7 @@ export default function Register() {
           name="Email"
           type="email"
           value={formData.Email}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => UserFormHandleChange(e, setFormData, setErr)}
           placeholder="example@email.com"
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />
@@ -67,7 +77,7 @@ export default function Register() {
           name="Password"
           type="password"
           value={formData.Password}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => UserFormHandleChange(e, setFormData, setErr)}
           placeholder="Password"
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />
@@ -76,7 +86,7 @@ export default function Register() {
           name="FullName"
           type="text"
           value={formData.FullName}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => UserFormHandleChange(e, setFormData, setErr)}
           placeholder="John Doe"
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />
@@ -85,7 +95,7 @@ export default function Register() {
           name="Position"
           type="text"
           value={formData.Position}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => UserFormHandleChange(e, setFormData, setErr)}
           placeholder="JavaScript developer"
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />
@@ -93,7 +103,7 @@ export default function Register() {
           name="AvatarUrl"
           type="text"
           value={formData.AvatarUrl}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => UserFormHandleChange(e, setFormData, setErr)}
           placeholder="https://avatar-picture-user.png"
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />

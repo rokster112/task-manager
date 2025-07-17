@@ -53,7 +53,7 @@ export default function Members({
   }, []);
 
   return (
-    <div className=" bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl relative">
+    <div className="bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl relative">
       <Header
         toggle={toggle}
         setToggle={setToggle}

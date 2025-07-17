@@ -8,6 +8,7 @@ export default function ProjectForm({
   submitLabel,
 }) {
   const navigate = useNavigate();
+  console.log(formData.StartDate);
   return (
     <div className="min-h-[calc(100vh-88px)] h-full w-full pt-[100px]">
       <form
@@ -34,11 +35,14 @@ export default function ProjectForm({
           onChange={handleChange}
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />
-
+        <label htmlFor="start" className="flex justify-start items-start">
+          Start Date
+        </label>
         <input
           required
+          id="start"
           name="StartDate"
-          type="date"
+          type="datetime-local"
           value={formData.StartDate}
           onChange={handleChange}
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] hover:border-gray-500 pl-2"
@@ -47,7 +51,7 @@ export default function ProjectForm({
         <input
           required
           name="EndDate"
-          type="date"
+          type="datetime-local"
           value={formData.EndDate}
           onChange={handleChange}
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] hover:border-gray-500 pl-2"

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { PriorityEnum, StatusEnum } from "../../pages/Projects";
 import DetailsGridPriority from "./DetailsGrid/DetailsGridPriority";
 import DetailsGridStatus from "./DetailsGrid/DetailsGridStatus";
 import DetailsGridInfo from "./DetailsGrid/DetailsGridInfo";
@@ -61,12 +60,9 @@ export default function DetailsGrid({
       }, 2000);
     }
   }
-  //! I will create the same thing for updating the Priority, but also need to consider adding color to priority
-  //! value and status as well like i have in Projects.jsx file. Also, i will probably have to split Status and Priority further,
-  //! because my file is getting too big.
 
   return (
-    <div className="grid grid-cols-2 sm:flex sm:flex-col bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">
+    <div className="h-fit grid grid-cols-2 sm:flex sm:flex-col bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">
       <DetailsGridStatus
         Status={Status}
         handleChange={(e) => handleChange(e)}
@@ -90,7 +86,6 @@ export default function DetailsGrid({
         EndDate={EndDate}
         CreatedAt={CreatedAt}
         ClientName={ClientName}
-        indexOfT={indexOfT}
       />
     </div>
   );
