@@ -16,9 +16,10 @@ export default function SelectedMembers({
 
   async function postMembers() {
     try {
+      const userIds = selectedMembers.map((m) => m.UserId);
       const response = await axios.patch(
         `${API}/projects/${id}/members`,
-        selectedMembers,
+        userIds,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -26,9 +27,7 @@ export default function SelectedMembers({
         }
       );
       resetData();
-    } catch (error) {
-      console.log("error ==>", error);
-    }
+    } catch (error) {}
   }
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 gap-2">

@@ -20,7 +20,8 @@ export async function safeApiCall(apiFunc) {
     const data = await apiFunc();
     return { data };
   } catch (error) {
-    const errorMsg = error.response?.data || "Something went wrong";
+    const errorMsg =
+      error.response?.data || error.message || "Something went wrong";
     return { error: errorMsg };
   }
 }

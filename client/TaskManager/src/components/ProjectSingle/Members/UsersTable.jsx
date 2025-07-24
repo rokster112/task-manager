@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Avatar from "../Avatar";
 
 export default function UsersTable({

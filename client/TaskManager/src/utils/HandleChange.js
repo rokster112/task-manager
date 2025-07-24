@@ -7,7 +7,7 @@ export function HandleChange(e, setErr, setFormData) {
   const newName = e.target.getAttribute("data-name")
     ? e.target.getAttribute("data-name")
     : name;
-  console.log(newName);
+
   setFormData((prev) => {
     const newVal =
       newName === "Priority" || newName === "Status" ? Number(val) : val;

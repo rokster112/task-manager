@@ -9,9 +9,8 @@ import { useSearchParams } from "react-router-dom";
 import DashboardTaskList from "../components/Dashboard/DashboardTaskList";
 import DashboardCarousel from "../components/Dashboard/DashboardCarousel";
 import DashboardCalendar from "../components/Dashboard/DashboardCalendar";
-import ThemeBtn from "../components/ThemeBtn";
 
-export default function Dashboard({ theme, setTheme }) {
+export default function Dashboard({ theme }) {
   const [searchParams, setSearchParams] = useSearchParams({
     projectQuery: "",
     taskQuery: "",
@@ -46,7 +45,6 @@ export default function Dashboard({ theme, setTheme }) {
 
   return (
     <div className="w-full overflow-y-auto overflow-x-hidden flex flex-col">
-      <ThemeBtn theme={theme} setTheme={setTheme} />
       <h1 className="ml-[3%] mb-6 text-4xl font-semibold">
         Welcome{user ? `, ${user.FullName.split(" ")[0]}` : " back"}!
       </h1>

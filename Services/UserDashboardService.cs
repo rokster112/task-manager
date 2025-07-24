@@ -53,36 +53,36 @@ public class UserDashboardService
   {
     if (query == "upcoming")
     {
-      var upcoming = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status != Status.Completed && p.StartDate > DateTime.UtcNow).ToListAsync();
+      var upcoming = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status != Status.Completed && p.StartDate > DateTime.UtcNow).ToListAsync();
       return upcoming;
     }
     if (query == "most-recent")
     {
-      var mostRecent = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status != Status.Completed).SortByDescending(p => p.CreatedAt).ToListAsync();
+      var mostRecent = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status != Status.Completed).SortByDescending(p => p.CreatedAt).ToListAsync();
       return mostRecent;
     }
     if (query == "overdue")
     {
-      var overdue = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status != Status.Completed && p.EndDate < DateTime.UtcNow).ToListAsync();
+      var overdue = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status != Status.Completed && p.EndDate < DateTime.UtcNow).ToListAsync();
       return overdue;
     }
     if (query == "due-in-seven-days")
     {
-      var dueSoon = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status != Status.Completed && p.EndDate >= DateTime.UtcNow && p.EndDate <= DateTime.UtcNow.AddDays(7)).ToListAsync();
+      var dueSoon = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status != Status.Completed && p.EndDate >= DateTime.UtcNow && p.EndDate <= DateTime.UtcNow.AddDays(7)).ToListAsync();
       return dueSoon;
     }
     if (query == "due-today")
     {
-      var dueToday = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status != Status.Completed && p.EndDate.Value.Date == DateTime.UtcNow.Date).ToListAsync();
+      var dueToday = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status != Status.Completed && p.EndDate.Value.Date == DateTime.UtcNow.Date).ToListAsync();
       return dueToday;
     }
 
     if (query == "high-priority")
     {
-      var highPriority = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status != Status.Completed && (int)p.Priority > 2).ToListAsync();
+      var highPriority = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status != Status.Completed && (int)p.Priority > 2).ToListAsync();
       return highPriority;
     }
-    return await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser) && p.Status == Status.InProgress).ToListAsync();
+    return await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser) && p.Status == Status.InProgress).ToListAsync();
   }
 
   public async Task<AuthUser> GetUserFullInfoAsync(string authenticatedUser)

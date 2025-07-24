@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { PriorityEnum, StatusEnum } from "../../../pages/Projects";
 import { HandleChange } from "../../../utils/HandleChange";
 import { RemoveMember } from "../../../utils/RemoveMember";
-import { FetchMemberData } from "../../../utils/FetchMemberData";
+import { safeApiCall } from "../../../services/DashboardService";
+import { fetchTaskMembers } from "../../../services/TaskService";
 
 export default function TaskForm({
   formData,
@@ -20,14 +21,14 @@ export default function TaskForm({
   taskId,
 }) {
   const navigate = useNavigate();
-  console.log("From the form", formData);
-  const sss =
-    toggleMembers &&
-    formData.AssignedForIds.length > 0 &&
-    members
-      .filter((m) => formData.AssignedForIds.includes(m.UserId))
-      .map((m) => m.FullName);
-  console.log("sss =>", sss);
+
+  async function fetchTaskMembersData() {
+    const { data, error } = await safeApiCall(() =>
+      fetchTaskMembers(id, taskId)
+    );
+    if (error) return setErr(error);
+    setMembers(data ?? []);
+  }
   return (
     <div className="flex flex-col items-center px-4 sm:px-8 py-6 w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg">
       {submitLabel === "Update Task" && (
@@ -67,7 +68,7 @@ export default function TaskForm({
         />
 
         <input
-          // required
+          required
           type="date"
           name="DueBy"
           value={formData.DueBy}
@@ -80,8 +81,7 @@ export default function TaskForm({
           onClick={() =>
             setToggleMembers((prev) => {
               const toggle = !prev;
-              if (toggle)
-                FetchMemberData(id, token, setMembers, setErr, taskId);
+              if (toggle) fetchTaskMembersData();
               return toggle;
             })
           }
@@ -147,7 +147,7 @@ export default function TaskForm({
         </select>
         {err && (
           <p className="text-red-600 text-sm font-medium">
-            {err.response?.data || err.message || "Something went wrong"}
+            {err.response?.data || err || "Something went wrong"}
           </p>
         )}
 

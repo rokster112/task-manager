@@ -7,4 +7,5 @@ public class TaskManagerDatabaseSettings
   public string ProjectsCollectionName { get; set; } = null!;
   public string UsersCollectionName { get; set; } = null!;
   public string TasksCollectionName { get; set; } = null!;
+  public string CommentsCollectionName { get; set; } = null!;
 }

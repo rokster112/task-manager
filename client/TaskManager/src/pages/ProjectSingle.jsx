@@ -9,9 +9,16 @@ import DeleteModal from "../components/ProjectSingle/DeleteModal";
 import { jwtDecode } from "jwt-decode";
 import UpdateProject from "./UpdateProject";
 import { ArrowLeft } from "lucide-react";
+import { safeApiCall } from "../services/DashboardService";
+import {
+  fetchProject,
+  fetchProjectMembers,
+} from "../services/ProjectSingleService";
 const API = import.meta.env.VITE_API;
 
 export default function ProjectSingle() {
+  const [err, setErr] = useState(false);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState(null);
   const [toggleMessage, setToggleMessage] = useState(false);
   const [project, setProject] = useState(null);
@@ -22,21 +29,22 @@ export default function ProjectSingle() {
   });
   const { id } = useParams();
   const token = localStorage.getItem("authToken");
-  const decoded = jwtDecode(token);
   const navigate = useNavigate();
+  const decoded = jwtDecode(token);
   const location = useLocation();
   const pathArr = location.pathname.split("/");
   const updatePath = pathArr.length <= 4 ? pathArr.at(-1) : id;
-  console.log(project?.StartDate, project?.EndDate);
+
   async function fetchData() {
-    try {
-      const response = await axios.get(`${API}/projects/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProject(response.data);
-    } catch (error) {}
+    const [projectResult, projectMembersResult] = await Promise.all([
+      safeApiCall(() => fetchProject(id)),
+      safeApiCall(() => fetchProjectMembers(id)),
+    ]);
+    const { data: projectData, error: projectErr } = projectResult;
+    const { data: memberData, error: memberErr } = projectMembersResult;
+    if (projectErr || memberErr) return setErr(projectErr || memberErr);
+    setProject(projectData ?? []);
+    setUsers(memberData ?? []);
   }
 
   async function handleDelete() {
@@ -70,14 +78,15 @@ export default function ProjectSingle() {
             onClick={() =>
               navigate(`/projects${search ? `?query=${search}` : ""}`)
             }
-            className="flex items-center gap-2 px-4 py-2 w-16 cursor-pointer text-gray-500 transition duration-400 ease-in-out hover:text-black"
+            className="flex items-center gap-2 m-[3%] px-4 py-2 text-gray-500 hover:text-black transition cursor-pointer"
           >
-            <ArrowLeft size={32} />
+            <ArrowLeft size={24} />
+            <span className="hidden sm:inline">Back</span>
           </button>
           <Header
             setToggleMessage={setToggleMessage}
             title={project.Title}
-            headOfProject={project.HeadOfProject.UserId}
+            headOfProject={project.HeadOfProject}
             currentUser={decoded.UserId}
             updatedStatusMessage={updatedStatusMessage}
             statusAndPriority={statusAndPriority}
@@ -100,6 +109,7 @@ export default function ProjectSingle() {
               token={token}
               fetchProjectData={fetchData}
               currentUser={decoded.UserId}
+              Users={users}
             />
             <div className="bg-[#feffff] h-fit rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">
               <p className="border-b-1 border-gray-200 text-gray-500 mb-2 pb-2 md:text-xl">
@@ -110,7 +120,7 @@ export default function ProjectSingle() {
             <Tasks
               id={id}
               token={token}
-              headOfProject={project.HeadOfProject.UserId}
+              headOfProject={project.HeadOfProject}
               currentUser={decoded.UserId}
             />
           </div>

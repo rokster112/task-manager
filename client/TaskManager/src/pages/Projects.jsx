@@ -104,12 +104,11 @@ export default function Projects() {
 
   useEffect(() => {
     fetchData();
-    console.log(location);
   }, [searchParams]);
   const mappedProjects = filteredProjects.map((item) => (
     <ProjectCard key={item.Id} project={item} search={search} />
   ));
-  // console.log(location.search);
+
   return (
     <div className="min-h-[calc(100vh-88px)] h-full">
       <div className="mr-2 sm:mr-4">

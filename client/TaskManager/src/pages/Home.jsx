@@ -8,12 +8,11 @@ import Bell from "../assets/bell-home.png";
 import { useUser } from "../context/UserContext";
 import ThemeBtn from "../components/ThemeBtn";
 
-export default function Home({ theme, setTheme }) {
+export default function Home({ theme }) {
   const token = localStorage.getItem("authToken");
 
   const noAuthHomeJSX = (
     <div className="xs:pt-[5vh]">
-      <ThemeBtn theme={theme} setTheme={setTheme} />
       <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-center mb-6">
         Welcome to Task Manager!
       </h1>
@@ -65,7 +64,7 @@ export default function Home({ theme, setTheme }) {
 
   return (
     <div className="h-[calc(100vh-88px)] flex flex-col items-center justify-start pt-[5vh]">
-      {token ? <Dashboard theme={theme} setTheme={setTheme} /> : noAuthHomeJSX}
+      {token ? <Dashboard theme={theme} /> : noAuthHomeJSX}
     </div>
   );
 }

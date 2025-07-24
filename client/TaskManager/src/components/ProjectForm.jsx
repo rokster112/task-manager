@@ -35,28 +35,28 @@ export default function ProjectForm({
           onChange={handleChange}
           className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] mt-4 hover:border-gray-500 pl-2"
         />
-        <label htmlFor="start" className="flex justify-start items-start">
+        <label className="flex justify-between items-center w-[calc(100%-40px)] xs:max-w-[360px]">
           Start Date
+          <input
+            required
+            name="StartDate"
+            type="datetime-local"
+            value={formData.StartDate}
+            onChange={handleChange}
+            className="border-1 border-gray-300 rounded-md bg-white h-10 max-w-[320px] hover:border-gray-500 pl-2"
+          />
         </label>
-        <input
-          required
-          id="start"
-          name="StartDate"
-          type="datetime-local"
-          value={formData.StartDate}
-          onChange={handleChange}
-          className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] hover:border-gray-500 pl-2"
-        />
-
-        <input
-          required
-          name="EndDate"
-          type="datetime-local"
-          value={formData.EndDate}
-          onChange={handleChange}
-          className="border-1 border-gray-300 rounded-md bg-white h-10 w-[calc(100%-40px)] xs:max-w-[360px] hover:border-gray-500 pl-2"
-        />
-
+        <label className="flex justify-between items-center w-[calc(100%-40px)] xs:max-w-[360px]">
+          End Date
+          <input
+            required
+            name="EndDate"
+            type="datetime-local"
+            value={formData.EndDate}
+            onChange={handleChange}
+            className="border-1 border-gray-300 rounded-md bg-white h-10 max-w-[320px] hover:border-gray-500 pl-2"
+          />
+        </label>
         <textarea
           name="Description"
           value={formData.Description}

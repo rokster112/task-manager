@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import TaskForm from "./TaskForm";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { safeApiCall } from "../../../services/DashboardService";
+import { updateTask } from "../../../services/TaskService";
 const API = import.meta.env.VITE_API;
 
 export default function TaskUpdate() {
   const navigate = useNavigate();
-  const { task, taskId, id, token, headOfProject, fetchTask } =
+  const { task, taskId, id, token, headOfProject, fetchTaskData } =
     useOutletContext();
   const [formData, setFormData] = useState({
     Title: task?.Title || "",
@@ -23,22 +25,13 @@ export default function TaskUpdate() {
 
   async function handleUpdateTask(e) {
     e.preventDefault();
-    try {
-      const response = await axios.patch(
-        `${API}/projects/${id}/tasks/${taskId}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      navigate(`/projects/${id}/tasks/${taskId}`, { replace: true });
-      fetchTask();
-    } catch (error) {
-      console.error(error);
-      setErr(error);
-    }
+    const { data, error } = await safeApiCall(() =>
+      updateTask(id, taskId, formData)
+    );
+    if (error) return setErr(error);
+
+    navigate(`/projects/${id}/tasks/${taskId}`, { replace: true });
+    fetchTaskData();
   }
 
   return (
@@ -55,7 +48,7 @@ export default function TaskUpdate() {
       setMembers={setMembers}
       toggleMembers={toggleMembers}
       setToggleMembers={setToggleMembers}
-      taskId={taskId}
+      taskId={null}
     />
   );
 }

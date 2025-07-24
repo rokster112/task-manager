@@ -4,7 +4,7 @@ import { StatusColor } from "../../../utils/AssignColors";
 
 export default function TaskList({ task, headOfProject, currentUser }) {
   const statusColor = StatusColor(StatusEnum[task.Status]);
-  // console.log(task);
+
   return (
     <div className="transition rounded-md border-gray-300 duration-400 my-2 ease-in-out hover:bg-gray-50 p-2 hover:border-1">
       <Link to={`tasks/${task.TaskId}`} state={{ headOfProject }}>

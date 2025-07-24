@@ -23,7 +23,7 @@ public class ProjectsService
 
   public async Task<List<Project>> GetProjectsAsync(string authenticatedUser, string? query = null)
   {
-    var allProjects = await _projectsCollection.Find(p => p.Users.Any(u => u.UserId == authenticatedUser)).ToListAsync();
+    var allProjects = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser)).ToListAsync();
     var activeProjects = allProjects.Where(p => p.Status != Status.Completed).ToList();
     if (query == "end-date-asc")
     {
@@ -59,17 +59,17 @@ public class ProjectsService
     }
     if (query == "my-led-projects")
     {
-      return allProjects.Where(p => p.HeadOfProject.UserId == authenticatedUser).ToList();
+      return allProjects.Where(p => p.HeadOfProject == authenticatedUser).ToList();
     }
 
     return allProjects;
   }
 
   public async Task<Project?> GetProjectAsync(string id, string authenticatedUser) =>
-    await _projectsCollection.Find(p => p.Id == id && p.Users.Any(u => u.UserId == authenticatedUser)).FirstOrDefaultAsync();
+    await _projectsCollection.Find(p => p.Id == id && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
   public async Task UpdateProjectAsync(string id, CreateProjectDTO dto, string authenticatedUser)
   {
-    var project = await _projectsCollection.Find(p => p.Id == id && p.HeadOfProject.UserId == authenticatedUser).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == id && p.HeadOfProject == authenticatedUser).FirstOrDefaultAsync();
     project.Title = !string.IsNullOrWhiteSpace(dto.Title) ? dto.Title : project.Title;
     project.StartDate = dto.StartDate != null ? dto.StartDate : project.StartDate;
     project.EndDate = dto.EndDate != null ? dto.EndDate : project.EndDate;
@@ -83,13 +83,6 @@ public class ProjectsService
   public async Task<Project> CreateProjectAsync(CreateProjectDTO dto, string authenticatedUser)
   {
     var foundUser = await _usersCollection.Find(u => u.UserId == authenticatedUser).FirstOrDefaultAsync();
-    var user = new UserInfoDTO
-    {
-      UserId = foundUser.UserId,
-      FullName = foundUser.FullName,
-      Position = foundUser.Position,
-      AvatarUrl = foundUser.AvatarUrl
-    };
     if (string.IsNullOrWhiteSpace(dto.Title)) throw new Exception("Title input is empty");
     if (dto.StartDate == null) throw new Exception("Please select start date");
     if (dto.EndDate == null) throw new Exception("Please select end date");
@@ -105,38 +98,65 @@ public class ProjectsService
       Description = dto.Description,
       Priority = dto.Priority,
       ClientName = dto.ClientName,
-      HeadOfProject = user,
-      Users = new List<UserInfoDTO> { user }
+      HeadOfProject = foundUser.UserId,
+      Users = new List<string> { foundUser.UserId }
     };
     await _projectsCollection.InsertOneAsync(newProject);
     return newProject;
   }
 
   public async Task DeleteProjectAsync(string id, string authenticatedUser) =>
-    await _projectsCollection.DeleteOneAsync(p => p.Id == id && p.HeadOfProject.UserId == authenticatedUser);
+    await _projectsCollection.DeleteOneAsync(p => p.Id == id && p.HeadOfProject == authenticatedUser);
 
   public async Task<List<UserInfoDTO>> GetMembersAsync(string id, string authenticatedUser)
   {
     var allUsers = await _usersCollection.Find(_ => true).ToListAsync();
     var project = await _projectsCollection.Find(p => p.Id == id).FirstOrDefaultAsync();
-    var userIds = project.Users.Select(u => u.UserId);
-    if (project.HeadOfProject.UserId != authenticatedUser) throw new Exception("You do not have a permission to view members");
-    return allUsers.Where(a => !userIds.Contains(a.UserId)).Select(u =>
+    if (!project.Users.Contains(authenticatedUser)) throw new Exception("You do not have a permission to view members");
+    return allUsers.Where(a => !project.Users.Contains(a.UserId)).Select(u =>
     {
       var user = new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl };
       return user;
     }).ToList();
   }
 
-  public async Task AddMembersAsync(string id, List<UserInfoDTO> addUsers, string authenticatedUser)
+  public async Task<UserInfoDTO> GetHeadAsync(string id, string authenticatedUser)
+  {
+  var project = await _projectsCollection.Find(p => p.Id == id && p.Users.Contains(authenticatedUser)).FirstOrDefaultAsync();
+    if (project is null)
+        throw new Exception("You do not have permission to view this data");
+
+    var user = await _usersCollection.Find(u => u.UserId == project.HeadOfProject).FirstOrDefaultAsync();
+    if (user is null)
+        throw new Exception("User not found");
+
+    return new UserInfoDTO
+    {
+        UserId = user.UserId,
+        FullName = user.FullName,
+        Position = user.Position,
+        AvatarUrl = user.AvatarUrl
+    };
+  }
+
+  public async Task<List<UserInfoDTO>> GetProjectMembersAsync(string id, string authenticatedUser)
+  {
+    var project = await _projectsCollection.Find(p => p.Id == id && p.Users.Contains(authenticatedUser)).FirstOrDefaultAsync();
+    if (project is null)
+      throw new Exception("You do not have permission to view this data");
+    var users = await _usersCollection.Find(u => project.Users.Contains(u.UserId)).ToListAsync();
+    return users.Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl }).ToList();
+  }
+
+  public async Task AddMembersAsync(string id, List<string> addUsers, string authenticatedUser)
   {
     var filter = Builders<Project>.Filter.Eq(p => p.Id, id) &
-      Builders<Project>.Filter.Eq(p => p.HeadOfProject.UserId, authenticatedUser);
+      Builders<Project>.Filter.Eq(p => p.HeadOfProject, authenticatedUser);
 
-    var project = await _projectsCollection.Find(p => p.Id == id && p.HeadOfProject.UserId == authenticatedUser).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == id && p.HeadOfProject == authenticatedUser).FirstOrDefaultAsync();
     if (project is null) throw new Exception("Project was not found or you are not logged in when trying to add members to the project");
 
-    var projectUsers = new List<UserInfoDTO>(project.Users);
+    var projectUsers = new List<string>(project.Users);
     projectUsers.AddRange(addUsers);
 
     var update = Builders<Project>.Update.Set(p => p.Users, projectUsers);
@@ -147,7 +167,7 @@ public class ProjectsService
 public async Task UpdateProjectStatusAndPriorityAsync(string id, string authenticatedUser, UpdateProjectStatusPriorityDTO dto)
 {
     var filter = Builders<Project>.Filter.Eq(p => p.Id, id) &
-      Builders<Project>.Filter.Eq(p => p.HeadOfProject.UserId, authenticatedUser);
+      Builders<Project>.Filter.Eq(p => p.HeadOfProject, authenticatedUser);
 
     var project = await _projectsCollection.Find(p => p.Id == id).FirstOrDefaultAsync();
     if (project is null)

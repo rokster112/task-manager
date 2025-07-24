@@ -1,10 +1,7 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { PriorityEnum } from "../../../pages/Projects";
-import { HandleChange } from "../../../utils/HandleChange";
-import { RemoveMember } from "../../../utils/RemoveMember";
-import { FetchMemberData } from "../../../utils/FetchMemberData";
 import TaskForm from "./TaskForm";
+import { safeApiCall } from "../../../services/DashboardService";
+import { postTask } from "../../../services/TaskService";
 
 const API = import.meta.env.VITE_API;
 
@@ -13,6 +10,7 @@ export default function TaskCreate({
   id,
   token,
   setToggleCreate,
+  toggleCreate,
 }) {
   const [toggleMembers, setToggleMembers] = useState(false);
   const [err, setErr] = useState(false);
@@ -28,33 +26,24 @@ export default function TaskCreate({
 
   async function handleSubmit(e) {
     e.preventDefault();
-    try {
-      if (!formData.DueBy) {
-        throw new Error("Please select due by date");
-      }
-      const response = await axios.post(
-        `${API}/projects/${id}/tasks`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      fetchTaskData();
-      setFormData({
-        Title: "",
-        AssignedForIds: [],
-        Description: "",
-        DueBy: "",
-        Priority: 0,
-        Status: 0,
-      });
-      setToggleCreate(false);
-    } catch (error) {
-      setErr(error);
-    }
+
+    const { data, error } = await safeApiCall(() => postTask(id, formData));
+    if (error) return setErr(error);
+
+    setFormData({
+      Title: "",
+      AssignedForIds: [],
+      Description: "",
+      DueBy: "",
+      Priority: 0,
+      Status: 0,
+    });
+    setToggleCreate(false);
   }
+
+  useEffect(() => {
+    fetchTaskData(id);
+  }, [toggleCreate]);
 
   return (
     <TaskForm

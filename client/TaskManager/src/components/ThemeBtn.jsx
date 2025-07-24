@@ -1,24 +1,16 @@
 export default function ThemeBtn({ theme, setTheme }) {
   const themeBlack = theme === "to-black" ? true : false;
   function handleTheme() {
-    if (theme === "to-blue-200") {
-      setTheme("to-black");
-    } else {
-      setTheme("to-blue-200");
-    }
+    const themeChoice = theme === "to-blue-200" ? "to-black" : "to-blue-200";
+    setTheme(themeChoice);
+    localStorage.setItem("theme", themeChoice);
   }
-  theme ? localStorage.setItem("theme", theme) : null;
+  // theme ? localStorage.setItem("theme", theme) : null;
 
   return (
     <div className=" w-full  flex flex-col  items-end justify-end">
       <div className="w-fit h-fit mr-4 xs:mr-8 mb-4">
-        <p
-          className={`${
-            themeBlack ? "text-white" : "text-black"
-          } font-semibold mb-1`}
-        >
-          Dark Mode
-        </p>
+        <p className={`text-black font-semibold mb-1`}>Dark Mode</p>
         <button className="relative w-full h-6 sm:h-8 py-2 bg-white rounded-3xl flex">
           <span
             className={`z-1 h-6 sm:h-8 absolute top-0 bg-green-400 rounded-3xl transition-all duration-300 ease-in-out ${

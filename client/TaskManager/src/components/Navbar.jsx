@@ -4,20 +4,23 @@ import { useEffect, useState } from "react";
 import Avatar from "./ProjectSingle/Avatar";
 import { useUser } from "../context/UserContext";
 
-export default function Navbar({ theme }) {
+export default function Navbar({ theme, setTheme }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [token, setToken] = useState(null);
   const { user } = useUser();
 
   function logout() {
-    localStorage.clear();
-    setToken(null);
     setTimeout(() => {
-      if (location.pathname === "/") {
-        window.location.reload();
+      localStorage.clear();
+      setToken(null);
+      setTheme("to-blue-200");
+
+      if (location.pathname !== "/") {
+        navigate("/", { replace: true });
       }
-      navigate("/", { replace: true });
+
+      window.location.reload();
     }, 50);
   }
 

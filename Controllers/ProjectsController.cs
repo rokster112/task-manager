@@ -70,7 +70,7 @@ public class ProjectsController : ControllerBase
   }
 
   [HttpPatch("{id:length(24)}/members")]
-  public async Task<ActionResult> AddUsers(string id, List<UserInfoDTO> addUsers)
+  public async Task<ActionResult> AddUsers(string id, List<string> addUsers)
   {
     var authenticatedUser = User.FindFirst("UserId")?.Value;
     if (authenticatedUser is null) throw new Exception("You are not logged in");
@@ -86,7 +86,23 @@ public class ProjectsController : ControllerBase
     return await _projectsService.GetMembersAsync(id, authenticatedUser);
   }
 
-[HttpPatch("{id:length(24)}/status-priority")]
+  [HttpGet("{id:length(24)}/head")]
+  public async Task<UserInfoDTO> GetHead(string id)
+  {
+    var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
+    return await _projectsService.GetHeadAsync(id, authenticatedUser);
+  }
+
+  [HttpGet("{id:length(24)}/project-members")]
+  public async Task<List<UserInfoDTO>> GetProjectMembers(string id)
+  {
+    var authenticatedUser = User.FindFirst("UserId")?.Value;
+    if (authenticatedUser is null) throw new Exception("You are not logged in");
+    return await _projectsService.GetProjectMembersAsync(id, authenticatedUser);
+  }
+
+  [HttpPatch("{id:length(24)}/status-priority")]
 public async Task<ActionResult> UpdateStatusAndPriority(string id, UpdateProjectStatusPriorityDTO dto)
 {
     var authenticatedUser = User.FindFirst("UserId")?.Value;

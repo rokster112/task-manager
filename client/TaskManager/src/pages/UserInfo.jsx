@@ -4,9 +4,10 @@ import { useUser } from "../context/UserContext";
 import { UserFormHandleChange } from "../utils/UserFormHandleChange";
 import axios from "axios";
 import edit from "../assets/edit-icon.png";
+import ThemeBtn from "../components/ThemeBtn";
 const API = import.meta.env.VITE_API;
 
-export default function UserInfo() {
+export default function UserInfo({ theme, setTheme }) {
   const { user, refetchUserInfo } = useUser();
   const [editMode, setEditMode] = useState({
     profile: false,
@@ -77,6 +78,7 @@ export default function UserInfo() {
           style={{ height: !editMode.password && "80vh" }}
           className="flex flex-col justify-evenly items-center h-[85vh] sm:h-[87vh] w-[95%] xs:w-[85%] sm:w-[75%] md:w-[65%] lg:w-[55%] xl:w-[45%] bg-[#fafbff] rounded-md shadow-2xl"
         >
+          <ThemeBtn theme={theme} setTheme={setTheme} />
           <h1 className="text-2xl font-bold sm:text-4xl md:text-5xl mt-12 mb-8">
             Personal Details
           </h1>

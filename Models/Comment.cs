@@ -11,5 +11,8 @@ public class Comment
   public string TaskId { get; set; } = null!;
   public string CommentBy { get; set; } = null!;
   public string Body { get; set; } = null!;
-  public DateTime CreatedAt { get; set; }
+  public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+  public string? ImageUrl { get; set; }
+  public string? ImageId { get; set; }
+  public IFormFile? Image { get; set; }
 }

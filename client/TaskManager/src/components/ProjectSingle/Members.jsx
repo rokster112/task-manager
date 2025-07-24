@@ -4,6 +4,11 @@ import Header from "./Members/Header";
 import ToggleButtonsRow from "./Members/ToggleButtonsRow";
 import UsersTable from "./Members/UsersTable";
 import SelectedMembers from "./Members/SelectedMembers";
+import {
+  fetchMembers,
+  fetchProjectHead,
+} from "../../services/ProjectSingleService";
+import { safeApiCall } from "../../services/DashboardService";
 const API = import.meta.env.VITE_API;
 
 export default function Members({
@@ -12,29 +17,30 @@ export default function Members({
   token,
   fetchProjectData,
   currentUser,
+  Users,
 }) {
-  const { HeadOfProject, Users } = project;
-  const [members, setMembers] = useState(null);
+  const { HeadOfProject } = project;
+  const [members, setMembers] = useState([]);
+  const [err, setErr] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState(null);
+  const [headOfProjectObject, setHeadOfProjectObject] = useState([]);
   const [toggle, setToggle] = useState({
     showCurrent: false,
     showAvailable: false,
     showSelection: false,
   });
 
-  // console.log("Members token", token);
-
   async function fetchData() {
-    try {
-      const response = await axios.get(`${API}/projects/${id}/members`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setMembers(response.data);
-    } catch (error) {
-      console.error("errror ======>", error);
-    }
+    const [membersResult, headResult] = await Promise.all([
+      safeApiCall(() => fetchMembers(id)),
+      safeApiCall(() => fetchProjectHead(id)),
+    ]);
+    const { data: membersData, error: membersErr } = membersResult;
+    const { data: headData, error: headErr } = headResult;
+    if (membersErr || headErr) return setErr(membersErr || headErr);
+
+    setHeadOfProjectObject(headData ?? []);
+    setMembers(membersData ?? []);
   }
 
   function resetData() {
@@ -49,18 +55,20 @@ export default function Members({
   }
 
   useEffect(() => {
-    if (currentUser === HeadOfProject.UserId) fetchData();
+    fetchData();
   }, []);
 
   return (
     <div className="bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl relative">
-      <Header
-        toggle={toggle}
-        setToggle={setToggle}
-        setSelectedMembers={setSelectedMembers}
-        HeadOfProject={HeadOfProject}
-        currentUser={currentUser}
-      />
+      {Object.entries(headOfProjectObject).length > 0 && (
+        <Header
+          toggle={toggle}
+          setToggle={setToggle}
+          setSelectedMembers={setSelectedMembers}
+          HeadOfProject={headOfProjectObject}
+          currentUser={currentUser}
+        />
+      )}
       <ToggleButtonsRow
         setToggle={setToggle}
         toggle={toggle}

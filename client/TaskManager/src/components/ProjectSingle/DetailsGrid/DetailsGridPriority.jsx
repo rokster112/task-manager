@@ -13,8 +13,9 @@ export default function DetailsGridPriority({
   handleStatusUpdate,
   headOfProject,
   currentUser,
+  setToggleEdit,
+  toggleEdit,
 }) {
-  const [toggleEdit, setToggleEdit] = useState(false);
   const priorityColor = PriorityColor(PriorityEnum[Priority]);
   const owner = currentUser === headOfProject;
   return (
@@ -37,7 +38,12 @@ export default function DetailsGridPriority({
               <img
                 src={penEdit}
                 className="h-6 w-6 cursor-pointer transition-all duration-400 ease-in-out hover:scale-125"
-                onClick={() => setToggleEdit((prev) => !prev)}
+                onClick={() =>
+                  setToggleEdit((prev) => ({
+                    ...prev,
+                    priority: !prev.priority,
+                  }))
+                }
               />
             ) : (
               <select
@@ -64,7 +70,10 @@ export default function DetailsGridPriority({
                   src={update}
                   className="w-9 h-6 text-white rounded cursor-pointer px-2 hover:bg-green-200 transition duration-400 ease-in-out lg:mr-2"
                   onClick={() => {
-                    setToggleEdit(false);
+                    setToggleEdit((prev) => ({
+                      ...prev,
+                      priority: false,
+                    }));
                     handleStatusUpdate();
                   }}
                 />
@@ -73,7 +82,10 @@ export default function DetailsGridPriority({
                   className="text-red-600 w-8 h-6 rounded-md px-2 py-1 mr-1 sm:mr-0 cursor-pointer transition duration-400 ease-in-out hover:bg-red-100"
                   onClick={() => {
                     setStatusAndPriority((prev) => ({ ...prev, Priority: "" }));
-                    setToggleEdit(false);
+                    setToggleEdit((prev) => ({
+                      ...prev,
+                      priority: false,
+                    }));
                   }}
                 />
               </div>

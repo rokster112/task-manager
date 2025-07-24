@@ -26,13 +26,13 @@ public class Project
   [BsonRepresentation(BsonType.ObjectId)]
   public string? Id { get; set; }
   public string Title { get; set; } = null!;
-  public List<UserInfoDTO> Users { get; set; } = null!;
+  public List<string> Users { get; set; } = new List<string>();
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
   public DateTime? StartDate { get; set; }
   public DateTime? EndDate { get; set; }
   public Status Status { get; set; } = Status.Created;
   public string Description { get; set; } = null!;
   public Priority Priority { get; set; }
-  public UserInfoDTO HeadOfProject { get; set; } = null!;
+  public string HeadOfProject { get; set; } = null!;
   public string? ClientName { get; set; }
 }

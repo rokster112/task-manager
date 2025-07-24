@@ -22,7 +22,7 @@ public class ProjectTasksService
 
   public async Task<List<ProjectTask>> GetTasksAsync(string authenticatedUser, string projectId)
   {
-    var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u.UserId == authenticatedUser)).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
     if (project is null) throw new Exception("You are not permitted access");
     var tasks = await _tasksCollection.Find(t => t.ProjectId == projectId).ToListAsync();
     if (tasks is null) throw new Exception("Not Found");
@@ -31,7 +31,7 @@ public class ProjectTasksService
 
   public async Task<ProjectTask?> GetTaskAsync(string authenticatedUser, string projectId, string id)
   {
-    var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u.UserId == authenticatedUser)).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
     if (project is null) throw new Exception("You are not permitted access");
     var task = await _tasksCollection.Find(t => t.ProjectId == projectId && t.TaskId == id).FirstOrDefaultAsync();
     if (task is null) throw new Exception("Not Found");
@@ -40,7 +40,7 @@ public class ProjectTasksService
 
   public async Task<ProjectTask> CreateTaskAsync(string authenticatedUser, string projectId, CreateProjectTaskDTO dto)
   {
-    var project = await _projectsCollection.Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == projectId && p.HeadOfProject == authenticatedUser).FirstOrDefaultAsync();
     if (project is null) throw new Exception("You are not authoried to create a task");
     if (string.IsNullOrWhiteSpace(dto.Title)) throw new Exception("Title input is empty");
     if (string.IsNullOrWhiteSpace(dto.Description)) throw new Exception("Description input is empty");
@@ -69,11 +69,11 @@ public class ProjectTasksService
 
   public async Task UpdateTaskAsync(string authenticatedUser, string projectId, string id, CreateProjectTaskDTO dto)
   {
-    var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u.UserId == authenticatedUser)).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
     var task = await _tasksCollection.Find(t => t.TaskId == id).FirstOrDefaultAsync();
     if (project is null) throw new Exception("Access denied, you are not part of the project");
     if (task is null) throw new Exception("Task Not Found");
-    if (!task.AssignedForIds.Any(a => a == authenticatedUser) && project.HeadOfProject.UserId != authenticatedUser) throw new Exception("You cannot modify the task");
+    if (!task.AssignedForIds.Any(a => a == authenticatedUser) && project.HeadOfProject != authenticatedUser) throw new Exception("You cannot modify the task");
 
     task.Title = !string.IsNullOrWhiteSpace(dto.Title) ? dto.Title : task.Title;
     task.Description = !string.IsNullOrWhiteSpace(dto.Description) ? dto.Description : task.Description;
@@ -104,7 +104,7 @@ public class ProjectTasksService
 
   public async Task DeleteTaskAsync(string authenticatedUser, string projectId, string id)
   {
-    var project = await _projectsCollection.Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser).FirstOrDefaultAsync();
+    var project = await _projectsCollection.Find(p => p.Id == projectId && p.HeadOfProject == authenticatedUser).FirstOrDefaultAsync();
     if (project is null) throw new Exception("You cannot delete this task");
     var task = await _tasksCollection.Find(t => t.TaskId == id && t.ProjectId == projectId).FirstOrDefaultAsync();
     if (task is null) throw new Exception("Task not found");
@@ -115,12 +115,12 @@ public class ProjectTasksService
   public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId)
   {
     var project = await _projectsCollection
-        .Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser)
+        .Find(p => p.Id == projectId && p.HeadOfProject == authenticatedUser)
         .FirstOrDefaultAsync();
 
     if (project is null) throw new Exception("You are not authorized");
 
-    var userIds = project.Users.Select(u => u.UserId).ToList();
+    var userIds = project.Users.Select(u => u).ToList();
 
     var allUsers = await _usersCollection.Find(u => userIds.Contains(u.UserId)).ToListAsync();
     return allUsers
@@ -132,7 +132,7 @@ public class ProjectTasksService
 public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId, string id)
 {
     var project = await _projectsCollection
-        .Find(p => p.Id == projectId && p.HeadOfProject.UserId == authenticatedUser)
+        .Find(p => p.Id == projectId && p.HeadOfProject == authenticatedUser)
         .FirstOrDefaultAsync();
 
     if (project is null) throw new Exception("You are not authorized");
@@ -140,8 +140,8 @@ public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, s
     var task = await _tasksCollection.Find(t => t.TaskId == id).FirstOrDefaultAsync();
     if (task is null) throw new Exception("Task not found");
 
-    var userIds = project.Users
-        .Select(p => p.UserId)
+    var userIds = task.AssignedForIds
+        .Select(p => p)
         .ToList();
 
     var allUsers = await _usersCollection.Find(u => userIds.Contains(u.UserId)).ToListAsync();

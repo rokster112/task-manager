@@ -2,8 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import TaskCreate from "./Tasks/TaskCreate";
 import TaskList from "./Tasks/TaskList";
-import { useLocation, useOutletContext } from "react-router-dom";
-import TaskSingle from "./Tasks/TaskSingle";
+import { safeApiCall } from "../../services/DashboardService";
+import { fetchTasks } from "../../services/TaskService";
 
 const API = import.meta.env.VITE_API;
 
@@ -11,21 +11,13 @@ export default function Tasks({ id, token, headOfProject, currentUser }) {
   const [err, setErr] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [toggleCreate, setToggleCreate] = useState(false);
-  const location = useLocation();
 
-  async function fetchTaskData() {
-    try {
-      const response = await axios.get(`${API}/projects/${id}/tasks`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setTasks(response?.data ?? []);
-      // console.log("Tasks =>", response);
-    } catch (error) {
-      console.error(error);
-      setErr(error);
-    }
+  async function fetchTaskData(id) {
+    const { data, error } = await safeApiCall(() => fetchTasks(id));
+    if (error) return setErr(error);
+
+    setTasks(data ?? []);
+    console.log("Task data =>", data);
   }
 
   const taskList = tasks.map((t) => (
@@ -38,8 +30,9 @@ export default function Tasks({ id, token, headOfProject, currentUser }) {
   ));
 
   useEffect(() => {
-    fetchTaskData();
-  }, []);
+    fetchTaskData(id);
+  }, [toggleCreate]);
+
   return (
     <div className="bg-[#feffff] h-fit rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">
       <p className="border-b-1 border-gray-200 text-gray-500 mb-2 pb-2 md:text-xl">
@@ -61,6 +54,7 @@ export default function Tasks({ id, token, headOfProject, currentUser }) {
           setToggleCreate={setToggleCreate}
           id={id}
           token={token}
+          toggleCreate={toggleCreate}
         />
       ) : (
         <div className="overflow-scroll max-h-[350px]">{taskList}</div>

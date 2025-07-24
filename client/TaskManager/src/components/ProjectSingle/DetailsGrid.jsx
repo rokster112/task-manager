@@ -2,6 +2,7 @@ import axios from "axios";
 import DetailsGridPriority from "./DetailsGrid/DetailsGridPriority";
 import DetailsGridStatus from "./DetailsGrid/DetailsGridStatus";
 import DetailsGridInfo from "./DetailsGrid/DetailsGridInfo";
+import { useState } from "react";
 const API = import.meta.env.VITE_API;
 
 export default function DetailsGrid({
@@ -16,7 +17,12 @@ export default function DetailsGrid({
 }) {
   const { Status, StartDate, Priority, EndDate, ClientName, CreatedAt } =
     project;
-  const indexOfT = project && StartDate.indexOf("T");
+
+  const [toggleEdit, setToggleEdit] = useState({
+    status: false,
+    priority: false,
+  });
+
   function handleChange(e) {
     const { name, value } = e.target;
     setStatusAndPriority((prev) => ({ ...prev, [name]: Number(value) }));
@@ -52,6 +58,7 @@ export default function DetailsGrid({
             ? statusAndPriority.Priority
             : prev.Priority,
       }));
+      setToggleEdit({ status: false, priority: false });
     } catch (error) {
     } finally {
       setTimeout(() => {
@@ -69,8 +76,10 @@ export default function DetailsGrid({
         statusAndPriority={statusAndPriority}
         setStatusAndPriority={setStatusAndPriority}
         handleStatusUpdate={handleStatusUpdate}
-        headOfProject={project.HeadOfProject.UserId}
+        headOfProject={project.HeadOfProject}
         currentUser={currentUser}
+        setToggleEdit={setToggleEdit}
+        toggleEdit={toggleEdit.status}
       />
       <DetailsGridPriority
         Priority={Priority}
@@ -78,8 +87,10 @@ export default function DetailsGrid({
         statusAndPriority={statusAndPriority}
         setStatusAndPriority={setStatusAndPriority}
         handleStatusUpdate={handleStatusUpdate}
-        headOfProject={project.HeadOfProject.UserId}
+        headOfProject={project.HeadOfProject}
         currentUser={currentUser}
+        setToggleEdit={setToggleEdit}
+        toggleEdit={toggleEdit.priority}
       />
       <DetailsGridInfo
         StartDate={StartDate}
