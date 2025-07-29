@@ -18,7 +18,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // Will have to change for prod frontend URL
+        policy.WithOrigins("https://task-manager-1-f773.onrender.com", "http://localhost:5173")
+
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
