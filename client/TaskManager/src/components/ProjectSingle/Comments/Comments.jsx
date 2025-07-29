@@ -15,25 +15,13 @@ const override = {
 
 export default function Comments({ currentUser, taskId, id, taskMembers }) {
   const [comments, setComments] = useState([]);
-  const [toggleUpdate, setToggleUpdate] = useState(false);
   const [err, setErr] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     Body: "",
+    Image: null,
   });
-  const [blurContent, setBlurContent] = useState(true);
 
-  //! I will probably have to delete the image once a comment is deleted as well, to avoid bugs in the future.
-  // async function uploadImage(file) {
-  //   const imageRef = ref(storage, `images/${file.name}`);
-  //   await uploadBytes(imageRef, file);
-  //   const downloadURL = await getDownloadURL(imageRef);
-  //   return downloadURL;
-  // }
-  // How it should look: CLOUDINARY_URL=cloudinary://<your_api_key>:<your_api_secret>@do36w9yv0
-  // API SECRET = fgpvApYSx3ZR03B0jWtWX9zSCqk
-  // API KEY = 613989425535592
-  // API NAME = do36w9yv0
   async function fetchCommentsData() {
     const { data, error } = await safeApiCall(() => fetchComments(taskId));
     if (error) return setErr(error);
@@ -54,7 +42,6 @@ export default function Comments({ currentUser, taskId, id, taskMembers }) {
     }
     setComments([]);
   }
-  console.log(comments);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -85,7 +72,6 @@ export default function Comments({ currentUser, taskId, id, taskMembers }) {
     fetchCommentsData();
   }, [taskMembers]);
   const currentUserObj = taskMembers.find((m) => m.UserId === currentUser);
-  console.log(comments);
   return (
     <div className="bg-[#feffff] rounded-xl p-2 pb-6 m-2 mb-0 md:p-6 md:m-6 md:mb-0 shadow-xl">
       <h3 className="font-semibold text-lg">Comments</h3>
@@ -97,7 +83,6 @@ export default function Comments({ currentUser, taskId, id, taskMembers }) {
               c={c}
               currentUser={currentUser}
               fetchCommentsData={fetchCommentsData}
-              handleFileUpload={handleFileUpload}
             />
           ))
         ) : (
@@ -153,7 +138,6 @@ export default function Comments({ currentUser, taskId, id, taskMembers }) {
           loading={loading}
           color="#325bff"
           size={60}
-          // className="flex justify-center items-center"
           cssOverride={override}
         />
       )}

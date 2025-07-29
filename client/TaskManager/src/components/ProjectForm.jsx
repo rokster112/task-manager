@@ -8,7 +8,7 @@ export default function ProjectForm({
   submitLabel,
 }) {
   const navigate = useNavigate();
-  console.log(formData.StartDate);
+
   return (
     <div className="min-h-[calc(100vh-88px)] h-full w-full pt-[100px]">
       <form

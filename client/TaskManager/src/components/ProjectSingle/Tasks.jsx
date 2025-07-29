@@ -12,12 +12,10 @@ export default function Tasks({ id, token, headOfProject, currentUser }) {
   const [tasks, setTasks] = useState([]);
   const [toggleCreate, setToggleCreate] = useState(false);
 
-  async function fetchTaskData(id) {
+  async function fetchTaskData() {
     const { data, error } = await safeApiCall(() => fetchTasks(id));
     if (error) return setErr(error);
-
     setTasks(data ?? []);
-    console.log("Task data =>", data);
   }
 
   const taskList = tasks.map((t) => (
@@ -30,8 +28,8 @@ export default function Tasks({ id, token, headOfProject, currentUser }) {
   ));
 
   useEffect(() => {
-    fetchTaskData(id);
-  }, [toggleCreate]);
+    fetchTaskData();
+  }, []);
 
   return (
     <div className="bg-[#feffff] h-fit rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">

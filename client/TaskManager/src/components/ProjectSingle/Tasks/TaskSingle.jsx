@@ -54,8 +54,6 @@ export default function TaskSingle({}) {
     setTaskMembers(memberData ?? []);
   }
 
-  console.log(taskMembers);
-
   async function fetchHeadOfProjectData() {
     const { data, error } = await safeApiCall(() => fetchHeadOfProject(id));
     if (error) return setErr(error);

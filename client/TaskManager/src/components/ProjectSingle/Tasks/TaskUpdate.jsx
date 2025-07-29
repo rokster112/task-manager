@@ -4,6 +4,7 @@ import TaskForm from "./TaskForm";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { safeApiCall } from "../../../services/DashboardService";
 import { updateTask } from "../../../services/TaskService";
+import { TransformDate } from "../../../utils/TransformDate";
 const API = import.meta.env.VITE_API;
 
 export default function TaskUpdate() {
@@ -14,7 +15,7 @@ export default function TaskUpdate() {
     Title: task?.Title || "",
     AssignedForIds: task?.AssignedForIds || [],
     Description: task?.Description || "",
-    DueBy: task?.DueBy ? task.DueBy.slice(0, 10) : "",
+    DueBy: task?.DueBy ? TransformDate(task.DueBy, true) : "",
     Priority: task?.Priority ?? 0,
     Status: task?.Status ?? 0,
   });

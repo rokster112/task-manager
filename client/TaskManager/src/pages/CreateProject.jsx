@@ -18,7 +18,6 @@ export default function CreateProject() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    console.log(name, ":", value);
     setFormData((prev) => ({
       ...prev,
       [name]: name == "Priority" ? Number(value) : value,
@@ -40,7 +39,7 @@ export default function CreateProject() {
         StartDate: new Date(prev.StartDate).toISOString(),
         EndDate: new Date(prev.EndDate).toISOString(),
       }));
-      console.log(formData);
+
       const response = await axios.post(`${API}/projects`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,7 +50,7 @@ export default function CreateProject() {
       setErr(error);
     }
   }
-  console.log(formData);
+
   return (
     <ProjectForm
       formData={formData}

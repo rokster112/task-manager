@@ -65,7 +65,7 @@ public class ProjectTasksController : ControllerBase
     try
     {
       var newTask = await _tasksService.CreateTaskAsync(authenticatedUser, projectId, dto);
-      return CreatedAtAction(nameof(GetTask), new { projectId = projectId, id = newTask.TaskId }, newTask);
+      return Ok(newTask);
     }
     catch (Exception ex)
     {

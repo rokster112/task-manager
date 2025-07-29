@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using TaskManagerApi.Models;
-
 namespace TaskManagerApi.Services;
 
 public class ProjectTasksService
@@ -10,7 +9,6 @@ public class ProjectTasksService
   private readonly IMongoCollection<ProjectTask> _tasksCollection;
   private readonly IMongoCollection<AuthUser> _usersCollection;
   private readonly IMongoCollection<Project> _projectsCollection;
-
   public ProjectTasksService(IOptions<TaskManagerDatabaseSettings> dbSettings)
   {
     var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
@@ -19,7 +17,6 @@ public class ProjectTasksService
     _usersCollection = mongoDatabase.GetCollection<AuthUser>(dbSettings.Value.UsersCollectionName);
     _projectsCollection = mongoDatabase.GetCollection<Project>(dbSettings.Value.ProjectsCollectionName);
   }
-
   public async Task<List<ProjectTask>> GetTasksAsync(string authenticatedUser, string projectId)
   {
     var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
@@ -28,7 +25,6 @@ public class ProjectTasksService
     if (tasks is null) throw new Exception("Not Found");
     return tasks;
   }
-
   public async Task<ProjectTask?> GetTaskAsync(string authenticatedUser, string projectId, string id)
   {
     var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
@@ -37,7 +33,6 @@ public class ProjectTasksService
     if (task is null) throw new Exception("Not Found");
     return task;
   }
-
   public async Task<ProjectTask> CreateTaskAsync(string authenticatedUser, string projectId, CreateProjectTaskDTO dto)
   {
     var project = await _projectsCollection.Find(p => p.Id == projectId && p.HeadOfProject == authenticatedUser).FirstOrDefaultAsync();
@@ -55,7 +50,7 @@ public class ProjectTasksService
       AssignedForIds = dto.AssignedForIds,
       Description = dto.Description,
       DueBy = dto.DueBy is DateTime dueBy
-          ? DateTime.SpecifyKind(dueBy, DateTimeKind.Utc)
+          ? DateTime.SpecifyKind(dueBy, DateTimeKind.Local)
           : DateTime.UtcNow,
       Priority = dto.Priority,
       Status = !Enum.IsDefined(typeof(Status), dto.Status) ? Status.Created : dto.Status,
@@ -110,7 +105,6 @@ public class ProjectTasksService
     if (task is null) throw new Exception("Task not found");
     await _tasksCollection.DeleteOneAsync(t => t.TaskId == id && t.ProjectId == projectId);
   }
-
 //Route without task id
   public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId)
   {
@@ -127,7 +121,6 @@ public class ProjectTasksService
         .Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl })
         .ToList();
   }
-
 //Route with task id
 public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId, string id)
 {
@@ -149,5 +142,4 @@ public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, s
         .Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl })
         .ToList();
 }
-
 }

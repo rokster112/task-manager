@@ -10,7 +10,6 @@ export default function TaskForm({
   setFormData,
   handleSubmit,
   submitLabel,
-  token,
   id,
   setErr,
   err,
@@ -69,7 +68,7 @@ export default function TaskForm({
 
         <input
           required
-          type="date"
+          type="datetime-local"
           name="DueBy"
           value={formData.DueBy}
           onChange={(e) => HandleChange(e, setErr, setFormData)}

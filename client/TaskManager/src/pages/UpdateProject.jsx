@@ -10,8 +10,8 @@ export default function UpdateProject({ project, id, token }) {
   const [err, setErr] = useState(false);
   const [formData, setFormData] = useState({
     Title: project.Title,
-    StartDate: project.StartDate.slice(0, 16),
-    EndDate: project.EndDate.slice(0, 16),
+    StartDate: TransformDate(project.StartDate, true),
+    EndDate: TransformDate(project.EndDate, true),
     Description: project.Description,
     Priority: project.Priority,
     ClientName: project.ClientName,
@@ -25,7 +25,6 @@ export default function UpdateProject({ project, id, token }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Response =>", response);
       navigate(`/projects/${id}`, { replace: true });
     } catch (error) {
       console.error("Error =>", error);

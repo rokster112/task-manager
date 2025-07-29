@@ -5,7 +5,6 @@ export default function ThemeBtn({ theme, setTheme }) {
     setTheme(themeChoice);
     localStorage.setItem("theme", themeChoice);
   }
-  // theme ? localStorage.setItem("theme", theme) : null;
 
   return (
     <div className=" w-full  flex flex-col  items-end justify-end">

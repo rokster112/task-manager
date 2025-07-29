@@ -5,14 +5,12 @@ using ZstdSharp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.IdentityModel.Tokens;
-
 namespace TaskManagerApi.Services;
 
 public class ProjectsService
 {
   private readonly IMongoCollection<Project> _projectsCollection;
   private readonly IMongoCollection<AuthUser> _usersCollection;
-
   public ProjectsService(IOptions<TaskManagerDatabaseSettings> dbSettings)
   {
     var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
@@ -20,7 +18,6 @@ public class ProjectsService
     _projectsCollection = mongoDatabase.GetCollection<Project>(dbSettings.Value.ProjectsCollectionName);
     _usersCollection = mongoDatabase.GetCollection<AuthUser>(dbSettings.Value.UsersCollectionName);
   }
-
   public async Task<List<Project>> GetProjectsAsync(string authenticatedUser, string? query = null)
   {
     var allProjects = await _projectsCollection.Find(p => p.Users.Any(u => u == authenticatedUser)).ToListAsync();
@@ -64,7 +61,6 @@ public class ProjectsService
 
     return allProjects;
   }
-
   public async Task<Project?> GetProjectAsync(string id, string authenticatedUser) =>
     await _projectsCollection.Find(p => p.Id == id && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
   public async Task UpdateProjectAsync(string id, CreateProjectDTO dto, string authenticatedUser)
@@ -76,7 +72,7 @@ public class ProjectsService
     project.Description = !string.IsNullOrWhiteSpace(dto.Description) ? dto.Description : project.Description;
     project.Priority = dto.Priority != project.Priority ? dto.Priority : project.Priority;
     project.ClientName = !string.IsNullOrWhiteSpace(dto.ClientName) ? dto.ClientName : project.ClientName;
-    project.Status = project.Status != dto.Status ? dto.Status : project.Status;
+    // project.Status = project.Status != dto.Status ? dto.Status : project.Status;
 
     await _projectsCollection.ReplaceOneAsync(p => p.Id == id, project);
   }
@@ -107,7 +103,6 @@ public class ProjectsService
 
   public async Task DeleteProjectAsync(string id, string authenticatedUser) =>
     await _projectsCollection.DeleteOneAsync(p => p.Id == id && p.HeadOfProject == authenticatedUser);
-
   public async Task<List<UserInfoDTO>> GetMembersAsync(string id, string authenticatedUser)
   {
     var allUsers = await _usersCollection.Find(_ => true).ToListAsync();
@@ -147,7 +142,6 @@ public class ProjectsService
     var users = await _usersCollection.Find(u => project.Users.Contains(u.UserId)).ToListAsync();
     return users.Select(u => new UserInfoDTO { UserId = u.UserId, FullName = u.FullName, Position = u.Position, AvatarUrl = u.AvatarUrl }).ToList();
   }
-
   public async Task AddMembersAsync(string id, List<string> addUsers, string authenticatedUser)
   {
     var filter = Builders<Project>.Filter.Eq(p => p.Id, id) &
@@ -163,7 +157,6 @@ public class ProjectsService
 
     await _projectsCollection.UpdateOneAsync(filter, update);
   }
-
 public async Task UpdateProjectStatusAndPriorityAsync(string id, string authenticatedUser, UpdateProjectStatusPriorityDTO dto)
 {
     var filter = Builders<Project>.Filter.Eq(p => p.Id, id) &

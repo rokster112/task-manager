@@ -7,12 +7,11 @@ using TaskManagerApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
-var key = "jdkgasdiuasdlbaskjgasdiukaksbdashjdafsdhjakbsdbaskhd";
-// var key = configuration["Jwt__Key"];
-// if (string.IsNullOrEmpty(key))
-// {
-//     throw new Exception("JWT Secret is empty/null");
-// }
+var key = configuration["Jwt__Key"];
+if (string.IsNullOrEmpty(key))
+{
+    throw new Exception("JWT Secret is empty/null");
+}
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -86,10 +85,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = "TaskManager",
         ValidAudience = "TaskManager",
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(key))
-        // Encoding.UTF8.GetBytes(configuration["Jwt__Key"] != null ? configuration["Jwt__Key"] : "Gavno" ))
-
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
     };
 });
 

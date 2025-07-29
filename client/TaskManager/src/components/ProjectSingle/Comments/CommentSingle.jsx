@@ -9,12 +9,7 @@ import { safeApiCall } from "../../../services/DashboardService";
 import { deleteComment, updateComment } from "../../../services/CommentService";
 import CommentSingleImg from "./CommentSingleImg";
 
-export default function CommentSingle({
-  c,
-  currentUser,
-  fetchCommentsData,
-  handleFileUpload,
-}) {
+export default function CommentSingle({ c, currentUser, fetchCommentsData }) {
   const [formData, setFormData] = useState({
     Body: c.Body,
     Image: c.Image,
@@ -73,7 +68,7 @@ export default function CommentSingle({
         {!toggleUpdate ? (
           <>
             <p className="w-full pr-4">{c.Body}</p>
-            <CommentSingleImg ImageUrl={c.ImageUrl} />
+            {c.ImageUrl && <CommentSingleImg ImageUrl={c.ImageUrl} />}
           </>
         ) : (
           <form>

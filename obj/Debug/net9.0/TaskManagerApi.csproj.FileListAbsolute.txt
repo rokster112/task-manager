@@ -47,7 +47,5 @@
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/client/TaskManager/package-lock.json
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/client/TaskManager/package.json
 /Users/rokas/TaskManagerApi/obj/Debug/net9.0/TaskManagerApi.sourcelink.json
-/Users/rokas/TaskManagerApi/bin/Debug/net9.0/client/TaskManager/cors.json
-/Users/rokas/TaskManagerApi/bin/Debug/net9.0/client/TaskManager/firebase.json
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/CloudinaryDotNet.dll
 /Users/rokas/TaskManagerApi/bin/Debug/net9.0/Newtonsoft.Json.dll

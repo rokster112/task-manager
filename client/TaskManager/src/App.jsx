@@ -13,7 +13,6 @@ import TaskSingle from "./components/ProjectSingle/Tasks/TaskSingle";
 import TaskUpdate from "./components/ProjectSingle/Tasks/TaskUpdate";
 import UserInfo from "./pages/UserInfo";
 import { useEffect, useState } from "react";
-import { useUser } from "./context/UserContext";
 
 export default function App() {
   const [theme, setTheme] = useState("to-blue-200");

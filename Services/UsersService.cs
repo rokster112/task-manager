@@ -78,10 +78,8 @@ public class UsersService
     };
 
     var token = new JwtSecurityToken(
-    // issuer: _config["Jwt:Issuer"],
-    issuer: "TaskManager",
-    // audience: _config["Jwt:Audience"],
-    audience: "TaskManager",
+    issuer: _config["Jwt:Issuer"],
+    audience: _config["Jwt:Audience"],
     claims: claims,
     expires: DateTime.UtcNow.AddHours(168),
     signingCredentials: credentials);

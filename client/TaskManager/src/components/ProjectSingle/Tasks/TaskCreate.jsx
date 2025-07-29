@@ -26,10 +26,9 @@ export default function TaskCreate({
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     const { data, error } = await safeApiCall(() => postTask(id, formData));
     if (error) return setErr(error);
-
+    fetchTaskData();
     setFormData({
       Title: "",
       AssignedForIds: [],
@@ -38,12 +37,8 @@ export default function TaskCreate({
       Priority: 0,
       Status: 0,
     });
-    setToggleCreate(false);
+    setToggleCreate((prev) => !prev);
   }
-
-  useEffect(() => {
-    fetchTaskData(id);
-  }, [toggleCreate]);
 
   return (
     <TaskForm

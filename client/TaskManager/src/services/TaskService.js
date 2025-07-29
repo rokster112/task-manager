@@ -32,7 +32,7 @@ export async function postTask(id, formData) {
   if (!formData.DueBy) {
     throw new Error("Please select due by date");
   }
-  const response = axios.post(`/projects/${id}/tasks`, formData);
+  const response = await axios.post(`/projects/${id}/tasks`, formData);
   return response.data;
 }
 
