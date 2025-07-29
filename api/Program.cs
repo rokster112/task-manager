@@ -7,22 +7,23 @@ using TaskManagerApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
-var key = configuration["Jwt__Key"];
+
+var key = Environment.GetEnvironmentVariable("Jwt__Key") ?? configuration["Jwt__Key"];
 if (string.IsNullOrEmpty(key))
 {
     throw new Exception("JWT Secret is empty/null");
 }
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("http://localhost:5173") // Will have to change for prod frontend URL
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 
-// Add services to the container.
 builder.Services.Configure<TaskManagerDatabaseSettings>(
     builder.Configuration.GetSection("TaskManagerDatabase")
 );
@@ -34,17 +35,14 @@ builder.Services.AddSingleton<CommentsService>();
 builder.Services.AddSingleton<CloudinaryService>();
 
 builder.Services.AddControllers()
-.AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
+builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "TaskManager API", Version = "v1" });
-
-    // Define the security scheme
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
@@ -53,58 +51,44 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-
-    // Require the token globally or on protected endpoints
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
-            new OpenApiSecurityScheme {
-                Reference = new OpenApiReference {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             new string[] {}
         }
     });
 });
 
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = "TaskManager",
-        ValidAudience = "TaskManager",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
-    };
-});
-
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = configuration["Jwt:Issuer"] ?? "TaskManager",
+            ValidAudience = configuration["Jwt:Audience"] ?? "TaskManager",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        };
+    });
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment()){
+
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Task Manager API V1");
-    });
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManager API V1"));
 }
 
-// Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
-
 app.UseCors("AllowFrontend");
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
