@@ -27,17 +27,3 @@ export async function updateComment(id, commentId, formData) {
   );
   return response.data;
 }
-
-export async function uploadImage(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", API_IMAGE_PRESET);
-
-  const response = await axios.post(
-    `https://api.cloudinary.com/v1_1/${API_IMAGE_UPLOAD}/image/upload`,
-    formData
-  );
-
-  console.log("Cloudinary response:", response.data);
-  return response.data.secure_url;
-}
