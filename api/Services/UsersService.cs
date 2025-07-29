@@ -66,8 +66,8 @@ public class UsersService
 
   private string GenerateJwtToken(string userId, string email)
   {
-    var secretKey = "jdkgasdiuasdlbaskjgasdiukaksbdashjdafsdhjakbsdbaskhd";
-    // var secretKey = _config["Jwt:Key"];
+    var secretKey = Environment.GetEnvironmentVariable("Jwt__Key")
+                    ?? _config["Jwt__Key"];
     var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
     var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
