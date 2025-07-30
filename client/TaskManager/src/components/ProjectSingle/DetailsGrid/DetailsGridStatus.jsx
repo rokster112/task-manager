@@ -26,7 +26,7 @@ export default function DetailsGridStatus({
       } text-gray-500 border-b-1 border-gray-200 md:text-xl md:mb-2`}
     >
       Status
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 mt-1 text-black font-semibold">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mt-1 text-black font-semibold">
         <span
           className={`min-w-[74px] ${!owner && "sm:text-end"}`}
           style={{ color: statusColor }}

@@ -69,7 +69,7 @@ export default function DetailsGrid({
   }
 
   return (
-    <div className="h-fit grid grid-cols-2 sm:flex sm:flex-col bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">
+    <div className="h-fit grid grid-cols-2 md:flex md:flex-col bg-[#feffff] rounded-xl p-2 m-2 md:p-6 md:m-6 shadow-xl">
       <DetailsGridStatus
         Status={Status}
         handleChange={(e) => handleChange(e)}

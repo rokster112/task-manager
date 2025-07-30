@@ -14,7 +14,13 @@ import {
   fetchProject,
   fetchProjectMembers,
 } from "../services/ProjectSingleService";
+import { ClipLoader } from "react-spinners";
 const API = import.meta.env.VITE_API;
+const override = {
+  margin: "0 auto",
+  display: "block",
+  marginTop: "20px",
+};
 
 export default function ProjectSingle() {
   const [err, setErr] = useState(false);
@@ -27,6 +33,7 @@ export default function ProjectSingle() {
     Status: "",
     Priority: "",
   });
+  const [loading, setLoading] = useState(true);
   const { id } = useParams();
   const token = localStorage.getItem("authToken");
   const navigate = useNavigate();
@@ -49,6 +56,7 @@ export default function ProjectSingle() {
 
   async function handleDelete() {
     try {
+      setLoading(true);
       const response = await axios.delete(`${API}/projects/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -57,6 +65,8 @@ export default function ProjectSingle() {
       navigate("/projects", { replace: true });
     } catch (error) {
       console.error("Error =====>", error);
+    } finally {
+      setLoading(false);
     }
   }
   useEffect(() => {
@@ -65,6 +75,19 @@ export default function ProjectSingle() {
       setSearch(location.search.slice(1));
     }
   }, [updatePath]);
+
+  if (loading) {
+    return (
+      <div className="h-screen">
+        <ClipLoader
+          loading={loading}
+          color="#325bff"
+          size={120}
+          cssOverride={override}
+        />
+      </div>
+    );
+  }
 
   return updatePath !== "update-project" && project ? (
     <>
