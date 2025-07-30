@@ -36,13 +36,13 @@ export default function Register({ theme }) {
 
   return (
     <div
-      className="h-screen w-full absolute top-0 bg-no-repeat bg-cover pt-[200px]"
+      className="h-screen w-full absolute top-0 bg-no-repeat bg-cover pt-[100px] md:pt-[200px]"
       style={{
         backgroundImage: `url(${theme === "to-blue-200" ? bg : darkBg})`,
       }}
     >
       <form
-        className={`relative flex gap-2 flex-col justify-start rounded-xl items-center h-[85%] xl:h-[75%] mx-auto w-[calc(100vw-40px)] xs:max-w-[400px] sm:max-w-[500px] bg-gradient-to-br from-transparent to-white ${
+        className={`relative flex gap-2 flex-col justify-start rounded-xl items-center h-[90%] xl:h-[75%] mx-auto w-[calc(100vw-40px)] xs:max-w-[400px] sm:max-w-[500px] bg-gradient-to-br from-transparent to-white ${
           theme === "to-black"
             ? "shadow-[0_12px_24px_rgba(0,0,0,0.8)]"
             : "shadow-xl"
