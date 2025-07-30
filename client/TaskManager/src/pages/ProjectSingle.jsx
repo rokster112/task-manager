@@ -33,7 +33,7 @@ export default function ProjectSingle() {
     Status: "",
     Priority: "",
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const token = localStorage.getItem("authToken");
   const navigate = useNavigate();
@@ -43,20 +43,33 @@ export default function ProjectSingle() {
   const updatePath = pathArr.length <= 4 ? pathArr.at(-1) : id;
 
   async function fetchData() {
-    const [projectResult, projectMembersResult] = await Promise.all([
-      safeApiCall(() => fetchProject(id)),
-      safeApiCall(() => fetchProjectMembers(id)),
-    ]);
-    const { data: projectData, error: projectErr } = projectResult;
-    const { data: memberData, error: memberErr } = projectMembersResult;
-    if (projectErr || memberErr) return setErr(projectErr || memberErr);
-    setProject(projectData ?? []);
-    setUsers(memberData ?? []);
+    try {
+      setLoading(true);
+
+      const [projectResult, projectMembersResult] = await Promise.all([
+        safeApiCall(() => fetchProject(id)),
+        safeApiCall(() => fetchProjectMembers(id)),
+      ]);
+
+      const { data: projectData, error: projectErr } = projectResult;
+      const { data: memberData, error: memberErr } = projectMembersResult;
+
+      if (projectErr || memberErr) {
+        setErr(projectErr || memberErr);
+        return;
+      }
+
+      setProject(projectData ?? []);
+      setUsers(memberData ?? []);
+    } catch (e) {
+      setErr("Unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleDelete() {
     try {
-      setLoading(true);
       const response = await axios.delete(`${API}/projects/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,8 +78,6 @@ export default function ProjectSingle() {
       navigate("/projects", { replace: true });
     } catch (error) {
       console.error("Error =====>", error);
-    } finally {
-      setLoading(false);
     }
   }
   useEffect(() => {
