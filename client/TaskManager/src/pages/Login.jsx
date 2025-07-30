@@ -39,7 +39,7 @@ export default function Login({ theme }) {
       }}
     >
       <form
-        className={`relative flex gap-2 flex-col justify-start rounded-xl items-center h-[90%] sm:h-3/4 mx-auto w-[calc(100vw-40px)] xs:max-w-[400px] sm:max-w-[500px] bg-gradient-to-br from-transparent to-white ${
+        className={`relative flex gap-2 flex-col justify-start rounded-xl items-center h-[80%] sm:h-3/4 mx-auto w-[calc(100vw-40px)] xs:max-w-[400px] sm:max-w-[500px] bg-gradient-to-br from-transparent to-white ${
           theme === "to-black"
             ? "shadow-[0_12px_24px_rgba(0,0,0,0.8)]"
             : "shadow-xl"
