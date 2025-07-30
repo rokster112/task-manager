@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/rokas/TaskManagerApi/TaskManagerApi.csproj": {}
+    "/Users/rokas/TaskManagerApi/api/TaskManagerApi.csproj": {}
   },
   "projects": {
-    "/Users/rokas/TaskManagerApi/TaskManagerApi.csproj": {
+    "/Users/rokas/TaskManagerApi/api/TaskManagerApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/rokas/TaskManagerApi/TaskManagerApi.csproj",
+        "projectUniqueName": "/Users/rokas/TaskManagerApi/api/TaskManagerApi.csproj",
         "projectName": "TaskManagerApi",
-        "projectPath": "/Users/rokas/TaskManagerApi/TaskManagerApi.csproj",
+        "projectPath": "/Users/rokas/TaskManagerApi/api/TaskManagerApi.csproj",
         "packagesPath": "/Users/rokas/.nuget/packages/",
-        "outputPath": "/Users/rokas/TaskManagerApi/obj/",
+        "outputPath": "/Users/rokas/TaskManagerApi/api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/rokas/.nuget/NuGet/NuGet.Config"

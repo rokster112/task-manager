@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "s9beOTQ9LWw=",
+  "dgSpecHash": "bqxBILF8/UU=",
   "success": true,
-  "projectFilePath": "/Users/rokas/TaskManagerApi/TaskManagerApi.csproj",
+  "projectFilePath": "/Users/rokas/TaskManagerApi/api/TaskManagerApi.csproj",
   "expectedPackageFiles": [
     "/Users/rokas/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/rokas/.nuget/packages/cloudinarydotnet/1.27.6/cloudinarydotnet.1.27.6.nupkg.sha512",
