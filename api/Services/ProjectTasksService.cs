@@ -129,7 +129,7 @@ public class ProjectTasksService
 public async Task<List<UserInfoDTO>> GetMembersAsync(string authenticatedUser, string projectId, string id)
 {
     var project = await _projectsCollection
-        .Find(p => p.Id == projectId && p.HeadOfProject == authenticatedUser)
+        .Find(p => p.Id == projectId)
         .FirstOrDefaultAsync();
 
     if (project is null) throw new Exception("You are not authorized");
