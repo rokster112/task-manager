@@ -21,7 +21,9 @@ public class ProjectTasksService
   {
     var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
     if (project is null) throw new Exception("You are not permitted access");
-    var tasks = await _tasksCollection.Find(t => t.ProjectId == projectId).ToListAsync();
+    var tasks = await _tasksCollection.Find(t => t.ProjectId == projectId &&
+        (t.AssignedForIds.Contains(authenticatedUser) || project.HeadOfProject == authenticatedUser)
+    ).ToListAsync();
     if (tasks is null) throw new Exception("Not Found");
     return tasks;
   }
@@ -29,7 +31,9 @@ public class ProjectTasksService
   {
     var project = await _projectsCollection.Find(p => p.Id == projectId && p.Users.Any(u => u == authenticatedUser)).FirstOrDefaultAsync();
     if (project is null) throw new Exception("You are not permitted access");
-    var task = await _tasksCollection.Find(t => t.ProjectId == projectId && t.TaskId == id).FirstOrDefaultAsync();
+    var task = await _tasksCollection.Find(t => t.ProjectId == projectId && t.TaskId == id &&
+    (t.AssignedForIds.Contains(authenticatedUser) || project.HeadOfProject == authenticatedUser)).FirstOrDefaultAsync();
+
     if (task is null) throw new Exception("Not Found");
     return task;
   }

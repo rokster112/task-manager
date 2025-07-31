@@ -38,7 +38,9 @@ export default function TaskSingle({}) {
   const canCompleteTask =
     task?.AssignedForIds.includes(decoded.UserId) ||
     headOfProject === decoded.UserId;
-  //! I need to display members assigned to the task!!!!
+
+  console.log(task?.AssignedForIds.includes(decoded.UserId));
+
   async function fetchTaskData() {
     const [taskResult, memberResult] = await Promise.all([
       safeApiCall(() => fetchTask(id, taskId)),
@@ -126,19 +128,22 @@ export default function TaskSingle({}) {
             </div>
 
             {/* Mark as Completed */}
-            {task && canCompleteTask && task.Status !== 3 && (
-              <button
-                onClick={(e) => handleUpdateTask(e, { Status: 3 }, setErr)}
-                className="w-fit inline-flex items-center gap-2"
-              >
-                <span className="peer flex h-8 w-8 text-green-600 text-xl font-bold rounded-full bg-gray-100 hover:bg-gray-200 hover:text-green-700 items-center justify-center cursor-pointer">
-                  &#10003;
-                </span>
-                <span className="transition-opacity duration-300 ease-in-out opacity-0 peer-hover:opacity-100 px-3 py-1 border border-black rounded-md text-sm">
-                  Mark as Completed
-                </span>
-              </button>
-            )}
+            {task &&
+              (task.AssignedForIds.includes(decoded.UserId) ||
+                headOfProject === decoded.UserId) &&
+              task.Status !== 3 && (
+                <button
+                  onClick={(e) => handleUpdateTask(e, { Status: 3 }, setErr)}
+                  className="w-fit inline-flex items-center gap-2"
+                >
+                  <span className="peer flex h-8 w-8 text-green-600 text-xl font-bold rounded-full bg-gray-100 hover:bg-gray-200 hover:text-green-700 items-center justify-center cursor-pointer">
+                    &#10003;
+                  </span>
+                  <span className="transition-opacity duration-300 ease-in-out opacity-0 peer-hover:opacity-100 px-3 py-1 border border-black rounded-md text-sm">
+                    Mark as Completed
+                  </span>
+                </button>
+              )}
 
             {/* Task Details */}
             <div className="space-y-2">

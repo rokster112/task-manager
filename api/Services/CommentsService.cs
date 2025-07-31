@@ -30,7 +30,7 @@ public class CommentsService
     var project = await _projectCollection.Find(p => p.Id == task.ProjectId).FirstOrDefaultAsync();
     if (project is null) throw new KeyNotFoundException("Associated project not found.");
     var comments = await _commentCollection.Find(c => c.TaskId == taskId).ToListAsync();
-    if (!task.AssignedForIds.Contains(authenticatedUser) && project.HeadOfProject != authenticatedUser) throw new UnauthorizedAccessException("You are not authorized to view these comments.");
+    // if (!task.AssignedForIds.Contains(authenticatedUser) && project.HeadOfProject != authenticatedUser) throw new UnauthorizedAccessException("You are not authorized to view these comments.");
     return comments;
   }
   public async Task<Comment> PostCommentAsync(string taskId, string authenticatedUser, CreateCommentDTO dto)

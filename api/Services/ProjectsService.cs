@@ -5,18 +5,23 @@ using ZstdSharp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.IdentityModel.Tokens;
+using System.Runtime.CompilerServices;
 namespace TaskManagerApi.Services;
 
 public class ProjectsService
 {
   private readonly IMongoCollection<Project> _projectsCollection;
   private readonly IMongoCollection<AuthUser> _usersCollection;
+  private readonly IMongoCollection<ProjectTask> _tasksCollection;
+  private readonly IMongoCollection<Comment> _commentsCollection;
   public ProjectsService(IOptions<TaskManagerDatabaseSettings> dbSettings)
   {
     var mongoClient = new MongoClient(dbSettings.Value.ConnectionString);
     var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
     _projectsCollection = mongoDatabase.GetCollection<Project>(dbSettings.Value.ProjectsCollectionName);
     _usersCollection = mongoDatabase.GetCollection<AuthUser>(dbSettings.Value.UsersCollectionName);
+    _tasksCollection = mongoDatabase.GetCollection<ProjectTask>(dbSettings.Value.TasksCollectionName);
+    _commentsCollection = mongoDatabase.GetCollection<Comment>(dbSettings.Value.CommentsCollectionName);
   }
   public async Task<List<Project>> GetProjectsAsync(string authenticatedUser, string? query = null)
   {
@@ -101,8 +106,18 @@ public class ProjectsService
     return newProject;
   }
 
-  public async Task DeleteProjectAsync(string id, string authenticatedUser) =>
-    await _projectsCollection.DeleteOneAsync(p => p.Id == id && p.HeadOfProject == authenticatedUser);
+  public async Task DeleteProjectAsync(string id, string authenticatedUser) {
+    var projectResult = await _projectsCollection.DeleteOneAsync(p => p.Id == id && p.HeadOfProject == authenticatedUser);
+
+    if (projectResult.DeletedCount > 0)
+    {
+      var tasks = await _tasksCollection.Find(t => t.ProjectId == id).ToListAsync();
+      var taskIds = tasks.Select(t => t.TaskId).ToList();
+      await _commentsCollection.DeleteManyAsync(c => taskIds.Contains(c.TaskId));
+      await _tasksCollection.DeleteManyAsync(t => t.ProjectId == id);
+    }
+  }
+
   public async Task<List<UserInfoDTO>> GetMembersAsync(string id, string authenticatedUser)
   {
     var allUsers = await _usersCollection.Find(_ => true).ToListAsync();
